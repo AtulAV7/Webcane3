@@ -552,13 +552,18 @@ If no element matches, write: ANSWER: -1"""
             nvidia_result = self._try_nvidia_vision(annotated_bytes, target, elem_list)
             if nvidia_result >= 0:
                 # NVIDIA returns the box ID (element ID), not an index
-                # Look up the element by ID directly
+                # First try in filtered list
                 for el in filtered:
                     if el['id'] == nvidia_result:
                         print(f"[Executor] NVIDIA Vision matched: element {nvidia_result}")
                         return nvidia_result
-                # If not found in filtered, might be element ID that wasn't filtered
-                print(f"[Executor] NVIDIA Vision returned {nvidia_result} but not found in filtered list")
+                # If not in filtered, try original elements (vision saw the full image)
+                for el in elements:
+                    if el['id'] == nvidia_result:
+                        print(f"[Executor] NVIDIA Vision matched (from original): element {nvidia_result}")
+                        return nvidia_result
+                # Still not found
+                print(f"[Executor] NVIDIA Vision returned {nvidia_result} but element not found")
             
             # Fallback to Gemini for vision
             print("[Executor] Vision: Trying Gemini fallback...")
@@ -593,14 +598,16 @@ If no element matches, write: ANSWER: -1"""
                         # Fallback: extract any number
                         match = next((int(n) for n in result.split() if n.lstrip('-').isdigit()), -1)
                     
-                    if match >= 0 and match < len(filtered):
-                        print(f"[Executor] Gemini Vision matched: element {filtered[match]['id']}")
-                        return filtered[match]['id']
-                    elif match >= 0:
-                        # match might be the actual element ID, not index
+                    if match >= 0:
+                        # Try filtered first
                         for el in filtered:
                             if el['id'] == match:
                                 print(f"[Executor] Gemini Vision matched: element {match}")
+                                return match
+                        # Try original elements as fallback
+                        for el in elements:
+                            if el['id'] == match:
+                                print(f"[Executor] Gemini Vision matched (from original): element {match}")
                                 return match
                     
                 except Exception as e:
