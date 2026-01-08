@@ -42,7 +42,7 @@ class SoMAnnotator:
         self, 
         screenshot_bytes: bytes, 
         elements: List[Dict],
-        max_elements: int = 60
+        max_elements: int = 80
     ) -> Tuple[bytes, List[Dict]]:
         """
         Filter elements and annotate screenshot with numbered boxes.

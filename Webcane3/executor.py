@@ -344,7 +344,7 @@ ID:"""
 TASK: Find the element that best matches: "{prompt.split('matches:')[1].split('"')[1] if 'matches:' in prompt else 'target'}"
 
 Available elements:
-{chr(10).join(elem_list[:25])}
+{chr(10).join(elem_list[:50])}
 
 Analyze the image and identify which numbered box matches best.
 First provide brief reasoning (1-2 sentences), then on a new line write: ANSWER: [number]
