@@ -42,11 +42,13 @@ class BrowserController:
                         return True
                     else:
                         print("[Browser] Opening new page in existing session")
-                        self.page = self.browser.new_page(no_viewport=True)
-                        self.page.set_viewport_size({
-                            'width': Config.BROWSER_VIEWPORT_WIDTH,
-                            'height': Config.BROWSER_VIEWPORT_HEIGHT
-                        })
+                        self.page = self.browser.new_page(
+                            viewport={
+                                'width': Config.BROWSER_VIEWPORT_WIDTH,
+                                'height': Config.BROWSER_VIEWPORT_HEIGHT
+                            },
+                            device_scale_factor=1
+                        )
                         return True
             except Exception as e:
                 print(f"[Browser] Existing session invalid: {e}, restarting...")
@@ -59,12 +61,16 @@ class BrowserController:
                 headless=headless,
                 args=['--start-maximized']
             )
-            self.page = self.browser.new_page(no_viewport=True)
-            self.page.set_viewport_size({
-                'width': Config.BROWSER_VIEWPORT_WIDTH,
-                'height': Config.BROWSER_VIEWPORT_HEIGHT
-            })
-            print("[Browser] Started successfully")
+            # Create page with device_scale_factor=1 to prevent DPI mismatch
+            # This ensures screenshot pixels match DOM coordinates
+            self.page = self.browser.new_page(
+                viewport={
+                    'width': Config.BROWSER_VIEWPORT_WIDTH,
+                    'height': Config.BROWSER_VIEWPORT_HEIGHT
+                },
+                device_scale_factor=1  # Force 1:1 pixel ratio
+            )
+            print("[Browser] Started successfully (device_scale_factor=1)")
             return True
             
         except Exception as e:

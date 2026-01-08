@@ -137,6 +137,43 @@ class Verifier:
         
         return order
     
+    def _detect_page_type(self, url: str, title: str = "") -> str:
+        """
+        Detect page type from URL and title.
+        
+        Returns one of: 'cart', 'product_page', 'search_results', 
+                       'video_page', 'homepage', 'checkout', 'unknown'
+        """
+        url_lower = url.lower()
+        title_lower = title.lower()
+        
+        # Cart pages
+        if any(kw in url_lower for kw in ['/cart', '/viewcart', '/basket', 'checkout/cart']):
+            return 'cart'
+        
+        # Checkout pages
+        if any(kw in url_lower for kw in ['/checkout', '/payment', '/order']):
+            return 'checkout'
+        
+        # Product pages
+        if any(kw in url_lower for kw in ['/product', '/dp/', '/item/', '/p/', '/itm/']):
+            return 'product_page'
+        
+        # Search results
+        if any(kw in url_lower for kw in ['search', 'q=', 'query=', 'results', '/s?']):
+            return 'search_results'
+        
+        # Video pages
+        if any(kw in url_lower for kw in ['/watch', '/video', 'youtube.com/watch', 'shorts']):
+            return 'video_page'
+        
+        # Homepage detection
+        if url_lower.rstrip('/').count('/') <= 3:  # Only domain, no deep path
+            if not any(kw in url_lower for kw in ['search', 'product', 'cart']):
+                return 'homepage'
+        
+        return 'unknown'
+    
     def _verify_with_method(
         self,
         method: str,
@@ -440,7 +477,7 @@ JSON:"""
         Check if the overall goal is satisfied after this action.
         
         IMPORTANT: Only return True if this is genuinely the final action
-        that completes the goal. Check step progress.
+        that completes the goal. Check step progress and page type.
         """
         if not goal:
             return False
@@ -448,44 +485,66 @@ JSON:"""
         goal_lower = goal.lower()
         action_type = action.get('action', '').lower()
         after_url = after_state.get('url', '').lower()
+        after_title = after_state.get('title', '')
+        
+        # Detect current page type
+        page_type = self._detect_page_type(after_url, after_title)
+        print(f"[Verifier] Page type detected: {page_type}")
         
         # If we're not on the last step, don't mark as complete
         # This prevents early termination
         if total_steps > 0 and current_step < total_steps - 1:
             return False
         
-        # Video/play goals: check if on watch page AND this was a click action
-        if any(w in goal_lower for w in ['play', 'watch']):
-            if ('watch' in after_url or '/shorts/' in after_url):
+        # === CART GOALS ===
+        if any(kw in goal_lower for kw in ['cart', 'add to cart', 'add to bag']):
+            # STRICT: Must actually be on cart page OR have cart confirmation
+            if page_type == 'cart':
+                print("[Verifier] Goal satisfied: On cart page")
+                return True
+            # Check for "added to cart" in URL or if click was on Add to Cart
+            if 'added' in after_url or 'viewcart' in after_url:
+                print("[Verifier] Goal satisfied: Item added to cart")
+                return True
+            # NOT satisfied if we're still on product page
+            if page_type == 'product_page':
+                print("[Verifier] Cart goal NOT satisfied: Still on product page")
+                return False
+        
+        # === PRODUCT GOALS ===
+        if any(kw in goal_lower for kw in ['product', 'click first', 'click the first', 'select']):
+            if 'add to cart' not in goal_lower and 'cart' not in goal_lower:
+                # Just clicking a product - verify we reached product page
+                if page_type == 'product_page':
+                    print("[Verifier] Goal satisfied: Product page reached")
+                    return True
+                if page_type == 'search_results':
+                    print("[Verifier] Product goal NOT satisfied: Still on search results")
+                    return False
+        
+        # === VIDEO/PLAY GOALS ===
+        if any(w in goal_lower for w in ['play', 'watch', 'video']):
+            if page_type == 'video_page':
                 if action_type == 'find_and_click':
                     print("[Verifier] Goal satisfied: Video page reached via click")
                     return True
         
-        # Search goals: ONLY satisfied after pressing Enter on search results
+        # === SEARCH GOALS ===
         if 'search' in goal_lower:
-            if 'results' in after_url or 'q=' in after_url:
+            if page_type == 'search_results':
                 if action_type == 'press_key' and action.get('target', '').lower() == 'enter':
                     print("[Verifier] Goal satisfied: Search results page reached")
                     return True
         
-        # Navigate-ONLY goals: goal is JUST navigation (no "and" with other actions)
-        # e.g., "go to youtube" but NOT "go to youtube and search"
+        # === NAVIGATE-ONLY GOALS ===
         if ('navigate' in goal_lower or 'go to' in goal_lower):
-            # Check if goal has additional actions (contains "and" + action words)
+            # Check if goal has additional actions
             has_additional_actions = (
                 ' and ' in goal_lower and 
-                any(w in goal_lower for w in ['search', 'find', 'click', 'type', 'play', 'watch', 'select'])
+                any(w in goal_lower for w in ['search', 'find', 'click', 'type', 'play', 'watch', 'select', 'add', 'cart'])
             )
             if not has_additional_actions and action_type == 'navigate':
                 print("[Verifier] Goal satisfied: Simple navigation complete")
-                return True
-        
-        # Click goals on specific items
-        if 'click' in goal_lower and action_type == 'find_and_click':
-            # Check if we clicked the intended target
-            target = action.get('target', '').lower()
-            if any(word in target for word in goal_lower.split() if len(word) > 3):
-                print("[Verifier] Goal satisfied: Click action completed")
                 return True
         
         return False

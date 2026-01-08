@@ -149,6 +149,70 @@ class Executor:
         except:
             return False
     
+    def _filter_elements_by_context(self, elements: List[Dict], target: str) -> tuple:
+        """
+        Filter elements to separate content from navigation.
+        Returns (content_elements, nav_elements).
+        
+        Deprioritizes:
+        - Elements in top 100px (nav area)
+        - Elements with nav-related text
+        
+        Prioritizes:
+        - Product cards (prices, buy buttons)
+        - Video thumbnails
+        - Main content area elements
+        """
+        nav_keywords = ['login', 'sign', 'menu', 'cart', 'account', 'profile', 
+                       'home', 'categories', 'help', 'contact']
+        content_keywords = ['add to', 'buy', 'price', '₹', '$', 'views', 'ago',
+                           'product', 'item', 'result']
+        
+        content_elements = []
+        nav_elements = []
+        
+        for el in elements:
+            bbox = el.get('bbox', {})
+            y_pos = bbox.get('y', 0)
+            text = (el.get('text', '') or '').lower()
+            
+            # Check if nav-related
+            is_nav = False
+            if y_pos < 100:  # Top 100px is usually nav
+                is_nav = True
+            elif any(kw in text for kw in nav_keywords):
+                is_nav = True
+            
+            # Check if content-related
+            is_content = False
+            if y_pos > 150:  # Below nav area
+                is_content = True
+            if any(kw in text for kw in content_keywords):
+                is_content = True
+            
+            # Prioritize based on target context
+            target_lower = target.lower()
+            if 'product' in target_lower or 'result' in target_lower or 'first' in target_lower:
+                # For product/result targets, strongly prefer content area
+                if is_content and not is_nav:
+                    content_elements.append(el)
+                else:
+                    nav_elements.append(el)
+            elif 'search' in target_lower or 'input' in target_lower:
+                # For search/input, nav area is fine
+                if 'search' in text or 'input' in el.get('tag', '').lower():
+                    content_elements.append(el)
+                else:
+                    nav_elements.append(el)
+            else:
+                # Default: prefer content, but keep nav available
+                if is_content:
+                    content_elements.append(el)
+                else:
+                    nav_elements.append(el)
+        
+        return content_elements, nav_elements
+    
     def _execute_navigate(self, url: str) -> Dict:
         """Navigate to URL."""
         if not url.startswith(('http://', 'https://')):
@@ -314,9 +378,14 @@ ID:"""
         except:
             return -1
     
-    def _try_nvidia_vision(self, annotated_bytes: bytes, prompt: str, elem_list: list) -> int:
+    def _try_nvidia_vision(self, annotated_bytes: bytes, target: str, elem_list: list) -> int:
         """
         Try NVIDIA API (Mistral Large) for vision analysis.
+        
+        Args:
+            annotated_bytes: Annotated screenshot bytes
+            target: The target element description to find
+            elem_list: List of element descriptions
         
         Returns:
             Element ID/index or -1 if failed
@@ -340,10 +409,10 @@ ID:"""
                 "Content-Type": "application/json"
             }
             
-            # Simplified prompt for NVIDIA
+            # Build NVIDIA prompt with actual target
             nvidia_prompt = f"""Look at this annotated screenshot. Each element has a red box with a number.
 
-TASK: Find the element that best matches: "{prompt.split('matches:')[1].split('"')[1] if 'matches:' in prompt else 'target'}"
+TASK: Find the element that best matches: "{target}"
 
 Available elements:
 {chr(10).join(elem_list[:50])}
@@ -437,33 +506,45 @@ If no element matches, write: ANSWER: -1"""
             except Exception as e:
                 print(f"[Executor] Vision: Failed to save SoM image: {e}")
             
-            # Build element list for context
-            elem_list = []
-            for i, el in enumerate(filtered[:30]):  # Limit to 30 elements
-                text = el.get('text', '')[:30] if el.get('text') else f"[{el.get('tag', 'elem')}]"
-                elem_list.append(f"Box {el['id']}: {text}")
+            # Filter elements by context - deprioritize nav, prioritize content
+            content_elements, nav_elements = self._filter_elements_by_context(filtered, target)
             
-            # Reasoning prompt for vision
-            prompt = f"""Analyze this annotated screenshot carefully. Each element has a red box with a number.
+            # Build element list for context with priority markers
+            elem_list = []
+            for el in content_elements[:20]:  # Main content first
+                text = el.get('text', '')[:40] if el.get('text') else f"[{el.get('tag', 'elem')}]"
+                elem_list.append(f"Box {el['id']}: {text} [MAIN CONTENT]")
+            for el in nav_elements[:10]:  # Nav elements after
+                text = el.get('text', '')[:30] if el.get('text') else f"[{el.get('tag', 'elem')}]"
+                elem_list.append(f"Box {el['id']}: {text} [NAV]")
+            
+            # Chain-of-thought reasoning prompt for vision
+            prompt = f"""VISION ANALYSIS TASK
 
-TASK: Find the element that best matches: "{target}"
+TARGET: "{target}"
 
-Available elements:
+ANALYSIS PROCESS (Follow these steps):
+Step 1: IDENTIFY ELEMENT TYPE - What are you looking for? (product, button, thumbnail, link?)
+Step 2: SCAN IMAGE - Look INSIDE each red numbered box
+Step 3: MATCH DESCRIPTION - Which box contains content matching "{target}"?
+Step 4: VALIDATE - Is this box in the main content area (not navigation)?
+
+AVAILABLE ELEMENTS:
 {chr(10).join(elem_list)}
 
-INSTRUCTIONS:
-1. Look at each numbered box in the image
-2. Consider what the target description is asking for (thumbnail, image, text, button, etc.)
-3. Match visual appearance, text content, and context
-4. Reason about which box best fits the target
+IMPORTANT RULES:
+- Boxes marked [NAV] are navigation elements - avoid unless target is a nav item
+- Boxes marked [MAIN CONTENT] are preferred for product/video/content clicks
+- For "first product" or "first result" - look for product cards with prices/images
+- Elements in top 100px are usually navigation - prefer boxes lower on page
 
-REASONING: First explain your analysis (2-3 sentences).
-Then on a new line, write: ANSWER: [box number]
+REASONING: First explain your step-by-step analysis (2-3 sentences).
+Then on a new line write: ANSWER: [box number]
 
 If no element matches, write: ANSWER: -1"""
             
             # Try NVIDIA API first (Mistral Large with vision)
-            nvidia_result = self._try_nvidia_vision(annotated_bytes, prompt, elem_list)
+            nvidia_result = self._try_nvidia_vision(annotated_bytes, target, elem_list)
             if nvidia_result >= 0:
                 # Check if it's an index or element ID
                 if nvidia_result < len(filtered):

@@ -233,6 +233,12 @@ STRICT SEARCH PROTOCOL - ALWAYS follow these 3 steps for ANY search:
 2. [type] the search query
 3. [press_key] Enter to submit
 
+CRITICAL SCROLLING RULES:
+1. NEVER scroll on search results pages - first 3-5 results are ALWAYS visible
+2. For "first", "top", "any" targets - NO SCROLLING NEEDED
+3. Only add scroll if explicitly needed (e.g., "10th result", "scroll down to see more")
+4. Product pages - items visible without scroll
+
 EXAMPLES:
 
 Goal: "Search for 8k videos"
@@ -242,23 +248,26 @@ Goal: "Search for 8k videos"
   {{"step": 3, "action": "press_key", "target": "Enter", "description": "Submit search", "verify": "URL_CHANGE"}}
 ]
 
-Goal: "Go to flipkart and search watches"
+Goal: "Go to flipkart and search samsung and click the first result"
 [
   {{"step": 1, "action": "navigate", "target": "https://www.flipkart.com", "description": "Open Flipkart", "verify": "URL_CHANGE"}},
   {{"step": 2, "action": "find_and_click", "target": "search box", "description": "Focus search", "verify": "NONE"}},
-  {{"step": 3, "action": "type", "target": "watches", "description": "Type query", "verify": "DOM_VALUE"}},
-  {{"step": 4, "action": "press_key", "target": "Enter", "description": "Submit", "verify": "URL_CHANGE"}}
+  {{"step": 3, "action": "type", "target": "samsung", "description": "Type query", "verify": "DOM_VALUE"}},
+  {{"step": 4, "action": "press_key", "target": "Enter", "description": "Submit", "verify": "URL_CHANGE"}},
+  {{"step": 5, "action": "find_and_click", "target": "first product result", "description": "Click first result", "verify": "URL_CHANGE"}}
 ]
 
-Goal: "Click the first video thumbnail"
+Goal: "Add to cart" (on product page)
 [
-  {{"step": 1, "action": "find_and_click", "target": "first video thumbnail", "description": "Click video", "verify": "VISION_OUTCOME"}}
+  {{"step": 1, "action": "find_and_click", "target": "Add to Cart button", "description": "Add item to cart", "verify": "URL_CHANGE"}}
 ]
 
 RULES:
-1. NEVER use [type] without a preceding [find_and_click] to focus the input
+1. NEVER use [type] without a preceding [find_and_click] to focus input
 2. For visual tasks (thumbnails, images): use descriptive target
 3. Check CURRENT URL before adding navigate
+4. NO scroll after search - results are visible immediately
+5. For "first product" or "first result" - just click, don't scroll
 
 Plan for: {goal}
 JSON:"""
