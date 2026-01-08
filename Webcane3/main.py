@@ -327,6 +327,33 @@ class WebCane:
             print(f"\n[Replan] Attempt {self.replan_count}/{Config.MAX_REPLAN_ATTEMPTS}")
             return {"needs_replan": True}
         
+        # Node: Final visual verification of goal completion
+        def final_verify(state: WebCaneState) -> dict:
+            """Perform final visual verification that goal was achieved."""
+            print("\n" + "-" * 50)
+            print("FINAL VERIFICATION PHASE")
+            print("-" * 50)
+            
+            # Take screenshot of current state
+            screenshot = self.browser.take_screenshot()
+            current_url = state.get("current_url", "")
+            
+            result = self.verifier.verify_goal_completion(
+                goal=state["goal"],
+                screenshot=screenshot,
+                current_url=current_url
+            )
+            
+            if result.get("success"):
+                return {"is_complete": True, "error": None}
+            else:
+                if result.get("needs_replan") and self.replan_count < Config.MAX_REPLAN_ATTEMPTS:
+                    self.replan_count += 1
+                    print(f"[Final Verify] Goal not achieved, replanning ({self.replan_count}/{Config.MAX_REPLAN_ATTEMPTS})")
+                    return {"needs_replan": True, "is_complete": False}
+                else:
+                    return {"is_complete": False, "error": result.get("reason", "Goal verification failed")}
+        
         # Node: Finalize success
         def finalize_success(state: WebCaneState) -> dict:
             elapsed = time.time() - state.get("start_time", time.time())
@@ -354,6 +381,7 @@ class WebCane:
         graph.add_node("verify", verify)
         graph.add_node("advance", advance)
         graph.add_node("handle_failure", handle_failure)
+        graph.add_node("final_verify", final_verify)
         graph.add_node("finalize_success", finalize_success)
         graph.add_node("finalize_failure", finalize_failure)
         
@@ -396,8 +424,16 @@ class WebCane:
                 plan = state.get("current_plan", [])
                 if idx + 1 < len(plan):
                     return "advance"
-                return "finalize_success"
+                # Last step completed - go to final verification
+                return "final_verify"
             return "handle_failure"
+        
+        def after_final_verify(state):
+            if state.get("is_complete"):
+                return "finalize_success"
+            if state.get("needs_replan"):
+                return "observe"  # Replan with current observation
+            return "finalize_failure"
         
         def after_failure(state):
             if state.get("error"):
@@ -416,6 +452,7 @@ class WebCane:
         graph.add_conditional_edges("verify", after_verify)
         graph.add_edge("advance", "execute")
         graph.add_conditional_edges("handle_failure", after_failure)
+        graph.add_conditional_edges("final_verify", after_final_verify)
         graph.add_edge("finalize_success", END)
         graph.add_edge("finalize_failure", END)
         
@@ -464,9 +501,12 @@ class WebCane:
         if not is_first_task and self.browser.page:
             initial_state["current_url"] = self.browser.page.url
         
-        # Run the graph
+        # Run the graph with increased recursion limit
         try:
-            final_state = self.graph.invoke(initial_state)
+            final_state = self.graph.invoke(
+                initial_state,
+                config={"recursion_limit": 100}
+            )
             
             history = final_state.get("execution_history", [])
             successful = len([h for h in history if h.get("success")])

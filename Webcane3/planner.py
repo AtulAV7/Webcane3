@@ -42,7 +42,7 @@ class Planner:
     - VISION_OUTCOME: Visual screenshot comparison
     """
     
-    VALID_ACTIONS = ['navigate', 'find_and_click', 'type', 'wait', 'scroll', 'press_key']
+    VALID_ACTIONS = ['navigate', 'find_and_click', 'type', 'wait', 'scroll', 'strong_scroll', 'press_key']
     VALID_VERIFY = ['URL_CHANGE', 'NONE', 'DOM_VALUE', 'VISION_OUTCOME']
     
     # Groq model for planning
@@ -140,7 +140,7 @@ class Planner:
             response = self.groq_client.chat.completions.create(
                 model=self.GROQ_PLANNING_MODEL,
                 messages=[{"role": "user", "content": prompt}],
-                max_tokens=2000,
+                max_tokens=4000,
                 reasoning_effort="high",
                 temperature=1
             )
@@ -218,7 +218,8 @@ ACTIONS:
 - find_and_click: Click element (target = element description)
 - type: Type text (target = text) - REQUIRES find_and_click BEFORE to focus input
 - press_key: Press key (target = Enter, Tab, Escape)
-- scroll: Scroll (target = down, up)
+- scroll: Scroll page (target = "down", "up", "down 800", "up 400" - add pixel value for custom scroll)
+- strong_scroll: For YouTube Shorts/Instagram Reels (target = "down" or "up") - moves to next/prev short
 - wait: Wait (target = seconds)
 
 VERIFICATION:
@@ -348,11 +349,60 @@ JSON for "{goal}":"""
                 except:
                     pass
             
+            # Try to repair truncated JSON arrays
+            repaired = self._repair_truncated_json(response)
+            if repaired:
+                return repaired
+            
             print(f"[Planner] Could not parse: {response[:200]}...")
             return None
             
         except Exception as e:
             print(f"[Planner] Parse error: {e}")
+            return None
+    
+    def _repair_truncated_json(self, response: str) -> Optional[List[Dict]]:
+        """
+        Attempt to repair truncated JSON arrays by extracting complete objects.
+        Handles cases where the response was cut off mid-way.
+        """
+        try:
+            # Find array start
+            start = response.find('[')
+            if start == -1:
+                return None
+            
+            content = response[start:]
+            
+            # Extract all complete {...} objects from the truncated response
+            objects = []
+            depth = 0
+            obj_start = -1
+            
+            for i, char in enumerate(content):
+                if char == '{':
+                    if depth == 0:
+                        obj_start = i
+                    depth += 1
+                elif char == '}':
+                    depth -= 1
+                    if depth == 0 and obj_start != -1:
+                        obj_str = content[obj_start:i+1]
+                        try:
+                            obj = json.loads(obj_str)
+                            if isinstance(obj, dict) and 'action' in obj:
+                                objects.append(obj)
+                        except:
+                            pass
+                        obj_start = -1
+            
+            if objects:
+                print(f"[Planner] Repaired truncated JSON: extracted {len(objects)} valid steps")
+                return objects
+            
+            return None
+        except Exception as e:
+            print(f"[Planner] JSON repair failed: {e}")
             return None
     
     def _finalize_plan(self, plan: Optional[List[Dict]]) -> List[Dict]:

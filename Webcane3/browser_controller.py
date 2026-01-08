@@ -227,6 +227,7 @@ class BrowserController:
     def click_element(self, element_id: int, elements: List[Dict]) -> bool:
         """
         Click an element by its ID using mouse coordinates.
+        Automatically switches to new tab if one opens.
         
         Args:
             element_id: Element ID from extract_elements()
@@ -249,14 +250,73 @@ class BrowserController:
             center_x = bbox['x'] + bbox['w'] / 2
             center_y = bbox['y'] + bbox['h'] / 2
             
+            # Get page count before click
+            pages_before = len(self.browser.contexts[0].pages) if self.browser else 0
+            
             self.page.mouse.click(center_x, center_y)
             self.page.wait_for_timeout(500)
+            
+            # Check if new tab opened
+            if self.browser:
+                pages_after = self.browser.contexts[0].pages
+                if len(pages_after) > pages_before:
+                    # Switch to newest tab
+                    self._switch_to_newest_tab()
             
             print(f"[Browser] Clicked element {element_id} at ({center_x:.0f}, {center_y:.0f})")
             return True
             
         except Exception as e:
             print(f"[Browser] Click failed: {e}")
+            return False
+    
+    def _switch_to_newest_tab(self):
+        """Switch to the most recently opened tab."""
+        try:
+            pages = self.browser.contexts[0].pages
+            if len(pages) > 1:
+                newest_page = pages[-1]
+                self.page = newest_page
+                
+                # Wait for new page to load
+                try:
+                    self.page.wait_for_load_state('domcontentloaded', timeout=5000)
+                except:
+                    pass
+                
+                print(f"[Browser] Switched to new tab: {self.page.url}")
+        except Exception as e:
+            print(f"[Browser] Tab switch failed: {e}")
+    
+    def check_for_new_tabs(self) -> bool:
+        """
+        Check for new tabs and switch to the newest one if found.
+        Call this after actions that might open new tabs.
+        
+        Returns:
+            True if switched to a new tab, False otherwise
+        """
+        if not self.browser:
+            return False
+        
+        try:
+            pages = self.browser.contexts[0].pages
+            
+            # If there are multiple tabs and we're not on the last one
+            if len(pages) > 1:
+                newest = pages[-1]
+                if newest != self.page:
+                    self.page = newest
+                    try:
+                        self.page.wait_for_load_state('domcontentloaded', timeout=5000)
+                    except:
+                        pass
+                    print(f"[Browser] Detected and switched to new tab: {self.page.url}")
+                    return True
+            
+            return False
+        except Exception as e:
+            print(f"[Browser] Tab check failed: {e}")
             return False
     
     def type_text(self, text: str) -> bool:
@@ -299,13 +359,13 @@ class BrowserController:
             print(f"[Browser] Key press failed: {e}")
             return False
     
-    def scroll(self, direction: str = "down", pixels: int = 500) -> bool:
+    def scroll(self, direction: str = "down", pixels: int = 600) -> bool:
         """
-        Scroll the page.
+        Scroll the page using mouse wheel.
         
         Args:
             direction: "up" or "down"
-            pixels: Number of pixels to scroll
+            pixels: Number of pixels to scroll (use larger values for shorts/reels)
             
         Returns:
             True on success, False on failure
@@ -313,15 +373,37 @@ class BrowserController:
         if not self.page:
             return False
         try:
-            if direction.lower() == "down":
-                self.page.evaluate(f"window.scrollBy(0, {pixels})")
-            elif direction.lower() == "up":
-                self.page.evaluate(f"window.scrollBy(0, -{pixels})")
-            print(f"[Browser] Scrolled {direction}")
+            # Move mouse to center so wheel event is captured correctly
+            viewport = self.page.viewport_size
+            center_x = viewport['width'] / 2
+            center_y = viewport['height'] / 2
+            
+            self.page.mouse.move(center_x, center_y)
+            
+            # Calculate scroll delta
+            delta_y = pixels if direction.lower() == "down" else -pixels
+            
+            # Perform mouse wheel scroll
+            self.page.mouse.wheel(0, delta_y)
+            
+            print(f"[Browser] Mouse wheel scroll {direction} ({pixels}px)")
             return True
         except Exception as e:
             print(f"[Browser] Scroll failed: {e}")
             return False
+    
+    def strong_scroll(self, direction: str = "down") -> bool:
+        """
+        Strong scroll for YouTube Shorts, Instagram Reels, etc.
+        Uses 1200px scroll to move to next short/reel.
+        
+        Args:
+            direction: "up" or "down" (next/previous)
+            
+        Returns:
+            True on success, False on failure
+        """
+        return self.scroll(direction=direction, pixels=1200)
     
     def get_page_info(self) -> Dict:
         """

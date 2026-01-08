@@ -121,6 +121,8 @@ class Executor:
             return self._execute_press_key(target)
         elif action_type == 'scroll':
             return self._execute_scroll(target)
+        elif action_type == 'strong_scroll':
+            return self._execute_strong_scroll(target)
         elif action_type == 'wait':
             return self._execute_wait(target)
         else:
@@ -590,15 +592,41 @@ Reply with ONLY the box number. If none match, reply -1."""
             'error': None if success else 'Key press failed'
         }
     
-    def _execute_scroll(self, direction: str) -> Dict:
-        """Scroll the page."""
-        direction = direction.lower() if direction in ['up', 'down'] else 'down'
-        success = self.browser.scroll(direction)
+    def _execute_scroll(self, target: str) -> Dict:
+        """
+        Scroll the page using mouse wheel.
+        Target can be: "down", "up", "down 800", "up 400", etc.
+        """
+        parts = target.lower().split()
+        direction = parts[0] if parts[0] in ['up', 'down'] else 'down'
+        
+        # Check if pixel value specified
+        pixels = 600  # default
+        if len(parts) > 1 and parts[1].isdigit():
+            pixels = int(parts[1])
+        
+        success = self.browser.scroll(direction, pixels)
         time.sleep(1)
         return {
             'success': success,
-            'method': 'direct',
+            'method': 'mouse_wheel',
+            'pixels': pixels,
             'error': None if success else 'Scroll failed'
+        }
+    
+    def _execute_strong_scroll(self, target: str) -> Dict:
+        """
+        Strong scroll for YouTube Shorts, Instagram Reels, etc.
+        Uses 1200px to move to next short/reel.
+        """
+        direction = target.lower() if target.lower() in ['up', 'down'] else 'down'
+        success = self.browser.strong_scroll(direction)
+        time.sleep(1.5)  # Extra wait for content to load
+        return {
+            'success': success,
+            'method': 'strong_scroll',
+            'pixels': 1200,
+            'error': None if success else 'Strong scroll failed'
         }
     
     def _execute_wait(self, seconds: str) -> Dict:

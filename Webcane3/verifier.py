@@ -489,3 +489,132 @@ JSON:"""
                 return True
         
         return False
+    
+    def verify_goal_completion(
+        self,
+        goal: str,
+        screenshot: bytes,
+        current_url: str
+    ) -> Dict:
+        """
+        Perform final visual verification that the goal was achieved.
+        Called after all steps complete successfully.
+        
+        Args:
+            goal: The original goal
+            screenshot: Current page screenshot
+            current_url: Current URL
+            
+        Returns:
+            Dict with success, reason, needs_replan
+        """
+        print("\n" + "=" * 50)
+        print("FINAL GOAL VERIFICATION")
+        print("=" * 50)
+        print(f"Goal: {goal}")
+        print(f"Current URL: {current_url}")
+        
+        if not screenshot or not self.groq_client:
+            # Can't do visual verification, assume success
+            print("[Verifier] No screenshot or API available, assuming goal complete")
+            return {
+                'success': True,
+                'reason': 'Unable to perform visual verification',
+                'needs_replan': False
+            }
+        
+        try:
+            # Generate expected outcome from goal
+            expected_outcome = self._generate_expected_outcome(goal)
+            print(f"[Verifier] Expected outcome: {expected_outcome}")
+            
+            # Compare screenshot with expected outcome
+            b64_screenshot = base64.b64encode(screenshot).decode('utf-8')
+            
+            prompt = f"""Analyze this screenshot and determine if the goal has been achieved.
+
+GOAL: "{goal}"
+EXPECTED OUTCOME: "{expected_outcome}"
+CURRENT URL: {current_url}
+
+Look at the screenshot and answer:
+1. Does the page show the expected result for this goal?
+2. Is there evidence the goal was completed successfully?
+
+Respond with ONLY one word: SUCCESS or FAILURE
+
+If the page clearly shows the goal was achieved (e.g., search results visible, video playing, product page loaded), respond SUCCESS.
+If the page does NOT show the expected outcome, respond FAILURE.
+
+Answer:"""
+            
+            response = self.groq_client.chat.completions.create(
+                model=Config.GROQ_VISION_MODEL,
+                messages=[
+                    {
+                        "role": "user",
+                        "content": [
+                            {"type": "text", "text": prompt},
+                            {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{b64_screenshot}"}}
+                        ]
+                    }
+                ],
+                max_tokens=50,
+                temperature=0.1
+            )
+            
+            result = response.choices[0].message.content.strip().upper()
+            print(f"[Verifier] Final verification result: {result}")
+            
+            if "SUCCESS" in result:
+                print("[Verifier] GOAL ACHIEVED!")
+                return {
+                    'success': True,
+                    'reason': 'Visual verification confirms goal completion',
+                    'needs_replan': False
+                }
+            else:
+                print("[Verifier] GOAL NOT ACHIEVED - Needs replanning")
+                return {
+                    'success': False,
+                    'reason': 'Visual verification shows goal not achieved',
+                    'needs_replan': True
+                }
+                
+        except Exception as e:
+            print(f"[Verifier] Final verification error: {e}")
+            # On error, don't replan - assume steps completed
+            return {
+                'success': True,
+                'reason': f'Verification error: {e}',
+                'needs_replan': False
+            }
+    
+    def _generate_expected_outcome(self, goal: str) -> str:
+        """Generate expected outcome description from goal using simple heuristics."""
+        goal_lower = goal.lower()
+        
+        # Search goals
+        if 'search' in goal_lower:
+            query = goal_lower.split('search')[-1].strip()
+            return f"Search results page showing results for '{query}'"
+        
+        # Navigate/go to goals
+        if 'go to' in goal_lower or 'navigate' in goal_lower:
+            site = goal_lower.replace('go to', '').replace('navigate to', '').strip()
+            return f"The {site} website homepage or main page"
+        
+        # Click goals
+        if 'click' in goal_lower:
+            return f"The page that appears after clicking the specified element"
+        
+        # Play/watch goals
+        if 'play' in goal_lower or 'watch' in goal_lower:
+            return f"A video player showing the video or video playing on the page"
+        
+        # Buy/cart goals
+        if 'buy' in goal_lower or 'cart' in goal_lower or 'add' in goal_lower:
+            return f"Item added to cart or purchase confirmation"
+        
+        # Default
+        return f"Visual evidence that '{goal}' was completed successfully"
