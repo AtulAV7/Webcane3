@@ -411,6 +411,28 @@ class BrowserController:
         """
         return self.scroll(direction=direction, pixels=1200)
     
+    def go_back(self) -> bool:
+        """
+        Navigate to the previous page in browser history.
+        
+        Returns:
+            True on success, False on failure
+        """
+        if not self.page:
+            return False
+        try:
+            self.page.go_back()
+            # Wait for page to load
+            try:
+                self.page.wait_for_load_state('domcontentloaded', timeout=5000)
+            except:
+                pass
+            print(f"[Browser] Navigated back to: {self.page.url}")
+            return True
+        except Exception as e:
+            print(f"[Browser] Go back failed: {e}")
+            return False
+    
     def get_page_info(self) -> Dict:
         """
         Get current page information.

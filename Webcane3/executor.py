@@ -125,6 +125,8 @@ class Executor:
             return self._execute_strong_scroll(target)
         elif action_type == 'wait':
             return self._execute_wait(target)
+        elif action_type == 'go_back':
+            return self._execute_go_back()
         else:
             return {'success': False, 'error': f'Unknown action: {action_type}'}
     
@@ -510,11 +512,14 @@ If no element matches, write: ANSWER: -1"""
             content_elements, nav_elements = self._filter_elements_by_context(filtered, target)
             
             # Build element list for context with priority markers
+            # Include ALL elements so box numbers match the annotated image
             elem_list = []
-            for el in content_elements[:20]:  # Main content first
+            # Add content elements first (preferred)
+            for el in content_elements:
                 text = el.get('text', '')[:40] if el.get('text') else f"[{el.get('tag', 'elem')}]"
-                elem_list.append(f"Box {el['id']}: {text} [MAIN CONTENT]")
-            for el in nav_elements[:10]:  # Nav elements after
+                elem_list.append(f"Box {el['id']}: {text} [CONTENT]")
+            # Add nav elements after
+            for el in nav_elements:
                 text = el.get('text', '')[:30] if el.get('text') else f"[{el.get('tag', 'elem')}]"
                 elem_list.append(f"Box {el['id']}: {text} [NAV]")
             
@@ -546,14 +551,14 @@ If no element matches, write: ANSWER: -1"""
             # Try NVIDIA API first (Mistral Large with vision)
             nvidia_result = self._try_nvidia_vision(annotated_bytes, target, elem_list)
             if nvidia_result >= 0:
-                # Check if it's an index or element ID
-                if nvidia_result < len(filtered):
-                    print(f"[Executor] NVIDIA Vision matched: element {filtered[nvidia_result]['id']}")
-                    return filtered[nvidia_result]['id']
+                # NVIDIA returns the box ID (element ID), not an index
+                # Look up the element by ID directly
                 for el in filtered:
                     if el['id'] == nvidia_result:
                         print(f"[Executor] NVIDIA Vision matched: element {nvidia_result}")
                         return nvidia_result
+                # If not found in filtered, might be element ID that wasn't filtered
+                print(f"[Executor] NVIDIA Vision returned {nvidia_result} but not found in filtered list")
             
             # Fallback to Gemini for vision
             print("[Executor] Vision: Trying Gemini fallback...")
@@ -601,53 +606,8 @@ If no element matches, write: ANSWER: -1"""
                 except Exception as e:
                     print(f"[Executor] Gemini vision error: {e}")
             
-            # Fallback to local Ollama model (qwen3:4b)
-            print("[Executor] Vision: Trying local Ollama fallback...")
-            try:
-                import ollama
-                import base64
-                
-                # Encode annotated image for Ollama
-                b64_image = base64.b64encode(annotated_bytes).decode('utf-8')
-                
-                # Simpler prompt for local model
-                local_prompt = f"""Look at this annotated image. Each element has a red box with a number.
-Find the box that matches: "{target}"
-
-Elements:
-{chr(10).join(elem_list[:20])}
-
-Reply with ONLY the box number. If none match, reply -1."""
-                
-                response = ollama.generate(
-                    model=Config.OLLAMA_MODEL,
-                    prompt=local_prompt,
-                    images=[b64_image],
-                    stream=False,
-                    options={'temperature': 0.1, 'num_predict': 50}
-                )
-                
-                result = response['response'].strip()
-                print(f"\n[Executor] Local Vision Output: {result}")
-                
-                # Extract number
-                import re
-                answer_match = re.search(r'(-?\d+)', result)
-                if answer_match:
-                    match = int(answer_match.group(1))
-                    if match >= 0:
-                        # Check if it's an index or element ID
-                        if match < len(filtered):
-                            print(f"[Executor] Local Vision matched: element {filtered[match]['id']}")
-                            return filtered[match]['id']
-                        for el in filtered:
-                            if el['id'] == match:
-                                print(f"[Executor] Local Vision matched: element {match}")
-                                return match
-                
-            except Exception as e:
-                print(f"[Executor] Local vision error: {e}")
-            
+            # No more fallbacks - return failure
+            print("[Executor] Vision: All vision agents failed")
             return -1
             
         except Exception as e:
@@ -718,6 +678,16 @@ Reply with ONLY the box number. If none match, reply -1."""
             return {'success': True, 'method': 'direct'}
         except:
             return {'success': False, 'method': 'direct', 'error': 'Invalid wait time'}
+    
+    def _execute_go_back(self) -> Dict:
+        """Navigate back to previous page."""
+        success = self.browser.go_back()
+        time.sleep(Config.STEP_DELAY)
+        return {
+            'success': success,
+            'method': 'direct',
+            'error': None if success else 'Go back failed'
+        }
     
     def get_stats(self) -> Dict:
         """Get execution statistics."""

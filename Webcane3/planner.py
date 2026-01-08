@@ -42,7 +42,7 @@ class Planner:
     - VISION_OUTCOME: Visual screenshot comparison
     """
     
-    VALID_ACTIONS = ['navigate', 'find_and_click', 'type', 'wait', 'scroll', 'strong_scroll', 'press_key']
+    VALID_ACTIONS = ['navigate', 'find_and_click', 'type', 'wait', 'scroll', 'strong_scroll', 'press_key', 'go_back']
     VALID_VERIFY = ['URL_CHANGE', 'NONE', 'DOM_VALUE', 'VISION_OUTCOME']
     
     # Groq model for planning
@@ -155,7 +155,13 @@ class Planner:
             
             return self._parse_plan(content)
         except Exception as e:
-            print(f"[Planner] Groq error: {e}")
+            error_str = str(e).lower()
+            if 'rate' in error_str or '429' in error_str or 'limit' in error_str:
+                print(f"[Planner] WARNING: Groq rate limit reached! Switching to Gemini fallback...")
+            elif 'timeout' in error_str:
+                print(f"[Planner] WARNING: Groq timeout - API may be slow")
+            else:
+                print(f"[Planner] Groq error: {e}")
             return None
     
     def _simplify_goal(self, goal: str) -> str:
@@ -220,6 +226,7 @@ ACTIONS:
 - press_key: Press key (target = Enter, Tab, Escape)
 - scroll: Scroll page (target = "down", "up", "down 800", "up 400" - add pixel value for custom scroll)
 - strong_scroll: For YouTube Shorts/Instagram Reels (target = "down" or "up") - moves to next/prev short
+- go_back: Navigate to previous page (useful for recovery after wrong clicks or when replanning)
 - wait: Wait (target = seconds)
 
 VERIFICATION:

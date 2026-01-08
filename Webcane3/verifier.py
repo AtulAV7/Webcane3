@@ -573,6 +573,18 @@ JSON:"""
         print(f"Goal: {goal}")
         print(f"Current URL: {current_url}")
         
+        # Skip visual verification for scroll/wait goals - these can't be verified visually
+        goal_lower = goal.lower()
+        if all(kw in goal_lower for kw in ['scroll']) or \
+           (all(kw not in goal_lower for kw in ['search', 'click', 'add', 'play', 'watch', 'cart', 'buy', 'navigate', 'go to']) and 
+            any(kw in goal_lower for kw in ['wait', 'scroll'])):
+            print("[Verifier] Scroll/wait goal - skipping visual verification (not verifiable)")
+            return {
+                'success': True,
+                'reason': 'Scroll/wait actions completed - not visually verifiable',
+                'needs_replan': False
+            }
+        
         if not screenshot or not self.groq_client:
             # Can't do visual verification, assume success
             print("[Verifier] No screenshot or API available, assuming goal complete")
@@ -596,16 +608,22 @@ GOAL: "{goal}"
 EXPECTED OUTCOME: "{expected_outcome}"
 CURRENT URL: {current_url}
 
-Look at the screenshot and answer:
-1. Does the page show the expected result for this goal?
-2. Is there evidence the goal was completed successfully?
+Look at the screenshot and determine if the goal was likely achieved.
 
-Respond with ONLY one word: SUCCESS or FAILURE
+BE LENIENT - if the page looks reasonable for the goal, mark it as success.
+For video goals: if a video is playing or visible, it's SUCCESS
+For search goals: if search results are visible, it's SUCCESS
+For scroll/navigation: if the page changed, it's SUCCESS
 
-If the page clearly shows the goal was achieved (e.g., search results visible, video playing, product page loaded), respond SUCCESS.
-If the page does NOT show the expected outcome, respond FAILURE.
+Respond in this format:
+REASONING: (1-2 sentences explaining what you see)
+CONFIDENCE: (HIGH, MEDIUM, or LOW)
+RESULT: (SUCCESS or FAILURE)
 
-Answer:"""
+Examples:
+- Goal "play video" + video page shown = SUCCESS
+- Goal "search cats" + search results shown = SUCCESS
+- Goal "click product" + product page shown = SUCCESS"""
             
             response = self.groq_client.chat.completions.create(
                 model=Config.GROQ_VISION_MODEL,
@@ -618,26 +636,56 @@ Answer:"""
                         ]
                     }
                 ],
-                max_tokens=50,
+                max_tokens=200,
                 temperature=0.1
             )
             
-            result = response.choices[0].message.content.strip().upper()
-            print(f"[Verifier] Final verification result: {result}")
+            result = response.choices[0].message.content.strip()
             
-            if "SUCCESS" in result:
+            # Debug: Show full API response with reasoning
+            print("\n[Verifier] Final Verification Response:")
+            print("-" * 40)
+            print(result)
+            print("-" * 40)
+            
+            result_upper = result.upper()
+            
+            # Extract confidence if present
+            confidence = "UNKNOWN"
+            if "CONFIDENCE:" in result_upper:
+                if "HIGH" in result_upper:
+                    confidence = "HIGH"
+                elif "MEDIUM" in result_upper:
+                    confidence = "MEDIUM"
+                elif "LOW" in result_upper:
+                    confidence = "LOW"
+            
+            print(f"[Verifier] Confidence: {confidence}")
+            
+            # Be lenient: SUCCESS if mentioned, or if confidence is HIGH/MEDIUM
+            if "SUCCESS" in result_upper:
                 print("[Verifier] GOAL ACHIEVED!")
                 return {
                     'success': True,
-                    'reason': 'Visual verification confirms goal completion',
-                    'needs_replan': False
+                    'reason': f'Visual verification: {result[:100]}',
+                    'needs_replan': False,
+                    'confidence': confidence
+                }
+            elif confidence in ["HIGH", "MEDIUM"] and "FAILURE" not in result_upper:
+                print("[Verifier] GOAL LIKELY ACHIEVED (high/medium confidence)")
+                return {
+                    'success': True,
+                    'reason': f'Visual verification: {result[:100]}',
+                    'needs_replan': False,
+                    'confidence': confidence
                 }
             else:
                 print("[Verifier] GOAL NOT ACHIEVED - Needs replanning")
                 return {
                     'success': False,
-                    'reason': 'Visual verification shows goal not achieved',
-                    'needs_replan': True
+                    'reason': f'Visual verification: {result[:100]}',
+                    'needs_replan': True,
+                    'confidence': confidence
                 }
                 
         except Exception as e:
