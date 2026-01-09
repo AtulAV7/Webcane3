@@ -380,14 +380,13 @@ ID:"""
         except:
             return -1
     
-    def _try_nvidia_vision(self, annotated_bytes: bytes, target: str, elem_list: list) -> int:
+    def _try_nvidia_vision(self, annotated_bytes: bytes, target: str) -> int:
         """
         Try NVIDIA API (Mistral Large) for vision analysis.
         
         Args:
             annotated_bytes: Annotated screenshot bytes
             target: The target element description to find
-            elem_list: List of element descriptions
         
         Returns:
             Element ID/index or -1 if failed
@@ -411,17 +410,19 @@ ID:"""
                 "Content-Type": "application/json"
             }
             
-            # Build NVIDIA prompt with actual target
-            nvidia_prompt = f"""Look at this annotated screenshot. Each element has a red box with a number.
+            # Build NVIDIA prompt - visual only, no text hints
+            nvidia_prompt = f"""Look at this screenshot with numbered red boxes around interactive elements.
 
 TASK: Find the element that best matches: "{target}"
 
-Available elements:
-{chr(10).join(elem_list[:50])}
+INSTRUCTIONS:
+1. Look at the VISUAL content inside each numbered red box
+2. Find the box that visually matches what is described
+3. For thumbnails/images - look at what the image shows
+4. For buttons/links - read the text inside the box
+5. Prefer elements in the main content area (center/below header)
 
-Analyze the image and identify which numbered box matches best.
-First provide brief reasoning (1-2 sentences), then on a new line write: ANSWER: [number]
-
+Provide brief reasoning (1-2 sentences), then write: ANSWER: [number]
 If no element matches, write: ANSWER: -1"""
             
             payload = {
@@ -508,48 +509,23 @@ If no element matches, write: ANSWER: -1"""
             except Exception as e:
                 print(f"[Executor] Vision: Failed to save SoM image: {e}")
             
-            # Filter elements by context - deprioritize nav, prioritize content
-            content_elements, nav_elements = self._filter_elements_by_context(filtered, target)
-            
-            # Build element list for context with priority markers
-            # Include ALL elements so box numbers match the annotated image
-            elem_list = []
-            # Add content elements first (preferred)
-            for el in content_elements:
-                text = el.get('text', '')[:40] if el.get('text') else f"[{el.get('tag', 'elem')}]"
-                elem_list.append(f"Box {el['id']}: {text} [CONTENT]")
-            # Add nav elements after
-            for el in nav_elements:
-                text = el.get('text', '')[:30] if el.get('text') else f"[{el.get('tag', 'elem')}]"
-                elem_list.append(f"Box {el['id']}: {text} [NAV]")
-            
-            # Chain-of-thought reasoning prompt for vision
-            prompt = f"""VISION ANALYSIS TASK
+            # Simple visual-only prompt for Gemini fallback (no text hints)
+            gemini_prompt = f"""Look at this screenshot with numbered red boxes around interactive elements.
 
-TARGET: "{target}"
+TASK: Find the element that best matches: "{target}"
 
-ANALYSIS PROCESS (Follow these steps):
-Step 1: IDENTIFY ELEMENT TYPE - What are you looking for? (product, button, thumbnail, link?)
-Step 2: SCAN IMAGE - Look INSIDE each red numbered box
-Step 3: MATCH DESCRIPTION - Which box contains content matching "{target}"?
-Step 4: VALIDATE - Is this box in the main content area (not navigation)?
+INSTRUCTIONS:
+1. Look at the VISUAL content inside each numbered red box
+2. Find the box that visually matches what is described
+3. For thumbnails/images - look at what the image shows
+4. For buttons/links - read the text inside the box
+5. Prefer elements in the main content area (center/below header)
 
-AVAILABLE ELEMENTS:
-{chr(10).join(elem_list)}
-
-IMPORTANT RULES:
-- Boxes marked [NAV] are navigation elements - avoid unless target is a nav item
-- Boxes marked [MAIN CONTENT] are preferred for product/video/content clicks
-- For "first product" or "first result" - look for product cards with prices/images
-- Elements in top 100px are usually navigation - prefer boxes lower on page
-
-REASONING: First explain your step-by-step analysis (2-3 sentences).
-Then on a new line write: ANSWER: [box number]
-
+Provide brief reasoning (1-2 sentences), then write: ANSWER: [number]
 If no element matches, write: ANSWER: -1"""
             
             # Try NVIDIA API first (Mistral Large with vision)
-            nvidia_result = self._try_nvidia_vision(annotated_bytes, target, elem_list)
+            nvidia_result = self._try_nvidia_vision(annotated_bytes, target)
             if nvidia_result >= 0:
                 # NVIDIA returns the box ID (element ID), not an index
                 # First try in filtered list
@@ -573,7 +549,7 @@ If no element matches, write: ANSWER: -1"""
                         model=Config.GEMINI_PLANNING_MODEL,
                         contents=[
                             types.Part.from_bytes(data=annotated_bytes, mime_type="image/png"),
-                            prompt
+                            gemini_prompt
                         ],
                         config=types.GenerateContentConfig(
                             temperature=0.2,

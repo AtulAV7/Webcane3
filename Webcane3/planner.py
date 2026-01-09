@@ -164,6 +164,150 @@ class Planner:
                 print(f"[Planner] Groq error: {e}")
             return None
     
+    def smart_replan(
+        self,
+        goal: str,
+        current_url: str,
+        page_context: str,
+        failed_action: Dict,
+        last_verified_url: str,
+        last_verified_step: int = 0
+    ) -> Dict:
+        """
+        Intelligent replanning using NVIDIA Mistral Large.
+        Analyzes situation and decides on recovery strategy.
+        
+        Args:
+            goal: Original goal
+            current_url: Current page URL
+            page_context: Description of current page
+            failed_action: The action that failed
+            last_verified_url: URL of last successfully verified state
+            last_verified_step: Index of last successful step
+            
+        Returns:
+            Dict with 'strategy' (RECOVER or GO_BACK) and 'plan' (list of actions)
+        """
+        import requests
+        
+        if not Config.NVIDIA_API_KEY:
+            print("[Replanner] NVIDIA API key not configured, using basic replanning")
+            return self._basic_replan_fallback(goal, current_url, page_context)
+        
+        print("\n" + "=" * 50)
+        print("SMART REPLANNING (NVIDIA Mistral Large)")
+        print("=" * 50)
+        
+        prompt = f"""You are a web automation recovery agent. Analyze the situation and decide on a recovery strategy.
+
+SITUATION:
+- Original Goal: "{goal}"
+- Failed Action: {failed_action.get('action', 'unknown')} on "{failed_action.get('target', 'unknown')}"
+- Failure Reason: {failed_action.get('error', 'Action verification failed')}
+- Current URL: {current_url}
+- Current Page: {page_context[:300] if page_context else 'Unknown page state'}
+- Last Verified URL: {last_verified_url}
+- Steps Completed Before Failure: {last_verified_step}
+
+ANALYZE AND DECIDE:
+1. What went wrong? (e.g., clicked wrong element, page didn't load, element not found)
+2. Can we recover from the CURRENT page to still achieve the goal?
+3. If YES → Create a recovery plan from current state
+4. If NO → We should use go_back to return to last verified state and retry
+
+RECOVERY DECISION RULES:
+- If current page is completely wrong (e.g., on wrong website, in checkout when should be browsing) → GO_BACK
+- If current page is close to target (e.g., on same site, just wrong page) → RECOVER with new navigation
+- If just clicked wrong element but on right page type → RECOVER by clicking correct element
+- If element wasn't found after scrolling → RECOVER by going back and trying different approach
+
+First, REASON about the situation (2-3 sentences).
+Then output:
+
+DECISION: [RECOVER or GO_BACK]
+REASONING: [Brief explanation of why this decision]
+
+If RECOVER, provide a JSON plan:
+PLAN: [JSON array of actions]
+
+If GO_BACK, provide go_back action followed by retry actions:
+PLAN: [{{"step": 1, "action": "go_back", "target": "", "description": "Return to last verified state", "verify": "URL_CHANGE"}}]"""
+
+        try:
+            headers = {
+                "Authorization": f"Bearer {Config.NVIDIA_API_KEY}",
+                "Accept": "application/json",
+                "Content-Type": "application/json"
+            }
+            
+            payload = {
+                "model": Config.NVIDIA_REPLANNER_MODEL,
+                "messages": [{"role": "user", "content": prompt}],
+                "max_tokens": 1500,
+                "temperature": 0.15,
+                "stream": False
+            }
+            
+            print("[Replanner] Calling NVIDIA Mistral Large...")
+            response = requests.post(Config.NVIDIA_API_URL, headers=headers, json=payload, timeout=30)
+            
+            if response.status_code != 200:
+                print(f"[Replanner] NVIDIA API error: {response.status_code}")
+                return self._basic_replan_fallback(goal, current_url, page_context)
+            
+            result = response.json()
+            content = result['choices'][0]['message']['content'].strip()
+            
+            print("\n[Replanner] NVIDIA Response:")
+            print("-" * 40)
+            print(content[:1000] if len(content) > 1000 else content)
+            print("-" * 40)
+            
+            # Parse decision
+            strategy = "RECOVER"
+            if "DECISION:" in content.upper():
+                if "GO_BACK" in content.upper():
+                    strategy = "GO_BACK"
+                    print("[Replanner] Strategy: GO_BACK to last verified state")
+                else:
+                    print("[Replanner] Strategy: RECOVER from current state")
+            
+            # Parse plan
+            plan = self._parse_plan(content)
+            
+            if not plan:
+                # Fallback: if GO_BACK decision but no plan, create go_back action
+                if strategy == "GO_BACK":
+                    plan = [{
+                        'step': 1,
+                        'action': 'go_back',
+                        'target': '',
+                        'description': 'Return to last verified state',
+                        'verify': 'URL_CHANGE'
+                    }]
+                else:
+                    return self._basic_replan_fallback(goal, current_url, page_context)
+            
+            return {
+                'strategy': strategy,
+                'plan': self._finalize_plan(plan),
+                'reasoning': content[:200] if content else 'No reasoning provided'
+            }
+            
+        except Exception as e:
+            print(f"[Replanner] Error: {e}")
+            return self._basic_replan_fallback(goal, current_url, page_context)
+    
+    def _basic_replan_fallback(self, goal: str, current_url: str, page_context: str) -> Dict:
+        """Fallback when smart replanning fails."""
+        print("[Replanner] Using basic replan fallback")
+        plan = self.create_plan(goal, current_url, page_context)
+        return {
+            'strategy': 'RECOVER',
+            'plan': plan,
+            'reasoning': 'Using basic replanning due to API failure'
+        }
+
     def _simplify_goal(self, goal: str) -> str:
         """Clean and simplify goal text."""
         goal = ' '.join(goal.split())

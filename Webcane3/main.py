@@ -157,24 +157,54 @@ class WebCane:
             print("PLANNING PHASE")
             print("-" * 50)
             
-            failure_context = None
+            current_url = state.get("current_url", state.get("starting_url", "about:blank"))
+            page_desc = state.get("page_description")
+            
+            # Check if this is a replan after failure
             if state.get("needs_replan"):
                 idx = state.get("current_step_index", 0)
                 plan_list = state.get("current_plan", [])
+                last_verified_url = state.get("last_verified_url", state.get("starting_url", "about:blank"))
+                last_verified_step = state.get("last_verified_step", 0)
+                
                 if idx < len(plan_list):
                     failed = plan_list[idx]
                     hist = state.get("execution_history", [])
                     reason = hist[-1].get("reason", "Unknown") if hist else "Unknown"
-                    failure_context = {
-                        "failed_action": f"{failed.get('action')}: {failed.get('target')}",
-                        "reason": reason,
-                        "current_state": state.get("page_description", "Unknown")
+                    
+                    # Build failed action info
+                    failed_action = {
+                        "action": failed.get('action'),
+                        "target": failed.get('target'),
+                        "error": reason
                     }
+                    
+                    print(f"\n[Smart Replan] Last verified URL: {last_verified_url}")
+                    print(f"[Smart Replan] Last verified step: {last_verified_step}")
+                    print(f"[Smart Replan] Failed action: {failed_action}")
+                    
+                    # Use smart replanning with NVIDIA Mistral
+                    replan_result = self.planner.smart_replan(
+                        goal=state["goal"],
+                        current_url=current_url,
+                        page_context=page_desc,
+                        failed_action=failed_action,
+                        last_verified_url=last_verified_url,
+                        last_verified_step=last_verified_step
+                    )
+                    
+                    if replan_result and replan_result.get("plan"):
+                        print(f"[Smart Replan] Strategy: {replan_result.get('strategy', 'UNKNOWN')}")
+                        return {
+                            "current_plan": replan_result["plan"],
+                            "current_step_index": 0,
+                            "retry_count": 0,
+                            "needs_replan": False,
+                            "replan_strategy": replan_result.get("strategy"),
+                            "error": None
+                        }
             
-            current_url = state.get("current_url", state.get("starting_url", "about:blank"))
-            page_desc = state.get("page_description")
-            
-            # Print what planner receives
+            # Normal planning (not replan)
             print(f"[Planner] Goal: {state['goal']}")
             print(f"[Planner] Current URL: {current_url}")
             if page_desc:
@@ -184,7 +214,7 @@ class WebCane:
                 goal=state["goal"],
                 current_url=current_url,
                 page_description=page_desc,
-                failure_context=failure_context
+                failure_context=None
             )
             
             if plan_result:
@@ -193,6 +223,8 @@ class WebCane:
                     "current_step_index": 0,
                     "retry_count": 0,
                     "needs_replan": False,
+                    "last_verified_url": current_url,  # Initialize last verified URL
+                    "last_verified_step": 0,
                     "error": None
                 }
             return {"current_plan": [], "error": "Planning failed"}
@@ -291,7 +323,8 @@ class WebCane:
             if goal_satisfied:
                 print("[Verify] GOAL SATISFIED!")
             
-            return {
+            # Track last verified state on success (for smart replanning recovery)
+            result = {
                 "is_complete": goal_satisfied,
                 "execution_history": [{
                     "step": idx + 1,
@@ -301,6 +334,13 @@ class WebCane:
                     "goal_satisfied": goal_satisfied
                 }]
             }
+            
+            # Update last verified state on successful verification
+            if success:
+                result["last_verified_url"] = state.get("current_url", "")
+                result["last_verified_step"] = idx
+            
+            return result
         
         # Node: Advance to next step
         def advance(state: WebCaneState) -> dict:

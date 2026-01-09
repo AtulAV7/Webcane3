@@ -25,6 +25,7 @@ class Config:
     
     # Model Names - NVIDIA (Vision Agent)
     NVIDIA_VISION_MODEL: str = "mistralai/mistral-large-3-675b-instruct-2512"
+    NVIDIA_REPLANNER_MODEL: str = "mistralai/mistral-large-3-675b-instruct-2512"
     NVIDIA_API_URL: str = "https://integrate.api.nvidia.com/v1/chat/completions"
     
     # Model Names - Groq
