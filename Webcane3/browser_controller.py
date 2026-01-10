@@ -205,6 +205,17 @@ class BrowserController:
             
             elements = self.page.evaluate(js_code)
             print(f"[Browser] Extracted {len(elements)} elements")
+            
+            # Save elements to JSON for debugging
+            try:
+                import os
+                debug_path = os.path.join(os.path.dirname(__file__), "debug_elements.json")
+                with open(debug_path, 'w', encoding='utf-8') as f:
+                    json.dump(elements, f, indent=2, ensure_ascii=False)
+                print(f"[Browser] Elements saved to debug_elements.json")
+            except Exception as save_err:
+                print(f"[Browser] Failed to save elements JSON: {save_err}")
+            
             return elements
             
         except Exception as e:

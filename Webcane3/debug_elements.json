@@ -1,0 +1,240 @@
+[
+  {
+    "id": 0,
+    "tag": "a",
+    "text": "XPath Locators for Selenium",
+    "type": "button",
+    "bbox": {
+      "x": 411,
+      "y": 25,
+      "w": 222,
+      "h": 22
+    },
+    "html_id": "",
+    "html_classes": ""
+  },
+  {
+    "id": 1,
+    "tag": "a",
+    "text": "View",
+    "type": "button",
+    "bbox": {
+      "x": 1058,
+      "y": 554,
+      "w": 40,
+      "h": 22
+    },
+    "html_id": "",
+    "html_classes": ""
+  },
+  {
+    "id": 2,
+    "tag": "a",
+    "text": "View",
+    "type": "button",
+    "bbox": {
+      "x": 1058,
+      "y": 610,
+      "w": 40,
+      "h": 22
+    },
+    "html_id": "",
+    "html_classes": ""
+  },
+  {
+    "id": 3,
+    "tag": "a",
+    "text": "View",
+    "type": "button",
+    "bbox": {
+      "x": 1058,
+      "y": 666,
+      "w": 40,
+      "h": 22
+    },
+    "html_id": "",
+    "html_classes": ""
+  },
+  {
+    "id": 4,
+    "tag": "a",
+    "text": "View",
+    "type": "button",
+    "bbox": {
+      "x": 1058,
+      "y": 722,
+      "w": 40,
+      "h": 22
+    },
+    "html_id": "",
+    "html_classes": ""
+  },
+  {
+    "id": 5,
+    "tag": "a",
+    "text": "View",
+    "type": "button",
+    "bbox": {
+      "x": 1058,
+      "y": 778,
+      "w": 40,
+      "h": 22
+    },
+    "html_id": "",
+    "html_classes": ""
+  },
+  {
+    "id": 6,
+    "tag": "a",
+    "text": "View",
+    "type": "button",
+    "bbox": {
+      "x": 1058,
+      "y": 833,
+      "w": 40,
+      "h": 22
+    },
+    "html_id": "",
+    "html_classes": ""
+  },
+  {
+    "id": 7,
+    "tag": "a",
+    "text": "View",
+    "type": "button",
+    "bbox": {
+      "x": 1058,
+      "y": 889,
+      "w": 40,
+      "h": 22
+    },
+    "html_id": "",
+    "html_classes": ""
+  },
+  {
+    "id": 8,
+    "tag": "input",
+    "text": "Any",
+    "type": "radio",
+    "bbox": {
+      "x": 319,
+      "y": 250,
+      "w": 13,
+      "h": 13
+    },
+    "html_id": "",
+    "html_classes": ""
+  },
+  {
+    "id": 9,
+    "tag": "input",
+    "text": "Java",
+    "type": "radio",
+    "bbox": {
+      "x": 319,
+      "y": 284,
+      "w": 13,
+      "h": 13
+    },
+    "html_id": "",
+    "html_classes": ""
+  },
+  {
+    "id": 10,
+    "tag": "input",
+    "text": "Python",
+    "type": "radio",
+    "bbox": {
+      "x": 319,
+      "y": 318,
+      "w": 13,
+      "h": 13
+    },
+    "html_id": "",
+    "html_classes": ""
+  },
+  {
+    "id": 11,
+    "tag": "input",
+    "text": "Beginner",
+    "type": "checkbox",
+    "bbox": {
+      "x": 597,
+      "y": 250,
+      "w": 13,
+      "h": 13
+    },
+    "html_id": "",
+    "html_classes": ""
+  },
+  {
+    "id": 12,
+    "tag": "input",
+    "text": "Intermediate",
+    "type": "checkbox",
+    "bbox": {
+      "x": 597,
+      "y": 284,
+      "w": 13,
+      "h": 13
+    },
+    "html_id": "",
+    "html_classes": ""
+  },
+  {
+    "id": 13,
+    "tag": "input",
+    "text": "Advanced",
+    "type": "checkbox",
+    "bbox": {
+      "x": 597,
+      "y": 318,
+      "w": 13,
+      "h": 13
+    },
+    "html_id": "",
+    "html_classes": ""
+  },
+  {
+    "id": 14,
+    "tag": "select",
+    "text": "ID Course Name Language Level Enrollments",
+    "type": "button",
+    "bbox": {
+      "x": 378,
+      "y": 417,
+      "w": 220,
+      "h": 38
+    },
+    "html_id": "sortBy",
+    "html_classes": ""
+  },
+  {
+    "id": 15,
+    "tag": "div",
+    "text": "Any",
+    "type": "button",
+    "bbox": {
+      "x": 874,
+      "y": 237,
+      "w": 232,
+      "h": 46
+    },
+    "html_id": "",
+    "html_classes": "dropdown-button"
+  },
+  {
+    "id": 16,
+    "tag": "div",
+    "text": "Minimum enrollments",
+    "type": "button",
+    "bbox": {
+      "x": 874,
+      "y": 237,
+      "w": 232,
+      "h": 46
+    },
+    "html_id": "enrollDropdown",
+    "html_classes": "dropdown"
+  }
+]

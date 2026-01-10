@@ -1,6 +1,9 @@
 """
 SoM (Set-of-Mark) Annotator for WebCane3.
 Draws numbered boxes on interactive elements for vision model analysis.
+
+Uses SEQUENTIAL numbering (0, 1, 2...) for easier vision detection,
+but returns a mapping of display_index -> element_id for accurate clicking.
 """
 
 from PIL import Image, ImageDraw, ImageFont
@@ -11,6 +14,9 @@ from typing import List, Dict, Tuple, Optional
 class SoMAnnotator:
     """
     Annotate screenshots with numbered boxes for vision-based automation.
+    
+    Uses sequential numbering on the image (easier for Vision models to read)
+    but maintains a mapping to original element IDs for accurate execution.
     """
     
     def __init__(self):
@@ -20,6 +26,10 @@ class SoMAnnotator:
         self.bg_color = "#FF0000"    # Red background for labels
         self.font_size = 14
         self.font = self._load_font()
+        
+        # Mapping: display_index -> element_id
+        # Updated each time annotate() is called
+        self.index_to_id_map = {}
     
     def _load_font(self) -> ImageFont.FreeTypeFont:
         """Load font for text annotations with fallback."""
@@ -47,6 +57,9 @@ class SoMAnnotator:
         """
         Filter elements and annotate screenshot with numbered boxes.
         
+        Uses sequential display indices (0, 1, 2...) on the image for easier
+        Vision model reading, but maintains index_to_id_map for conversion.
+        
         Args:
             screenshot_bytes: PNG screenshot as bytes
             elements: List of DOM elements
@@ -60,6 +73,9 @@ class SoMAnnotator:
         draw = ImageDraw.Draw(image)
         
         img_width, img_height = image.size
+        
+        # Reset mapping
+        self.index_to_id_map = {}
         
         # Filter elements
         filtered = []
@@ -81,9 +97,14 @@ class SoMAnnotator:
             if len(filtered) >= max_elements:
                 break
         
-        # Draw boxes with sequential numbering
-        for idx, el in enumerate(filtered):
-            self._draw_box(draw, el, str(idx))
+        # Draw boxes with SEQUENTIAL numbering (0, 1, 2...)
+        # But store mapping: display_index -> element_id
+        for display_idx, el in enumerate(filtered):
+            self.index_to_id_map[display_idx] = el['id']
+            self._draw_box(draw, el, str(display_idx))
+        
+        # Print mapping for debugging
+        print(f"[SoM] Created {len(filtered)} annotations with index->id mapping")
         
         # Save to bytes
         output = io.BytesIO()
@@ -92,6 +113,23 @@ class SoMAnnotator:
         
         return annotated_bytes, filtered
     
+    def get_element_id(self, display_index: int) -> int:
+        """
+        Convert a display index (from Vision agent) to actual element ID.
+        
+        Args:
+            display_index: The number shown in the annotated image
+            
+        Returns:
+            The actual element ID for clicking, or -1 if not found
+        """
+        element_id = self.index_to_id_map.get(display_index, -1)
+        if element_id >= 0:
+            print(f"[SoM] Mapping: display index {display_index} -> element ID {element_id}")
+        else:
+            print(f"[SoM] WARNING: No mapping for display index {display_index}")
+        return element_id
+    
     def _draw_box(self, draw: ImageDraw.ImageDraw, element: Dict, label: str):
         """
         Draw a labeled box around an element.
@@ -99,7 +137,7 @@ class SoMAnnotator:
         Args:
             draw: PIL ImageDraw object
             element: Element dict with bbox
-            label: Label text (usually the index)
+            label: Label text (the display index)
         """
         bbox = element['bbox']
         x, y, w, h = bbox['x'], bbox['y'], bbox['w'], bbox['h']

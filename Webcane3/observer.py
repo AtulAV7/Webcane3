@@ -1,13 +1,13 @@
 """
-Observer agent for WebCane3.
-Provides visual page description using Groq Vision model.
-Saves screenshots to folder for debugging.
+Observer agent for WebCane3 ReAct workflow.
+Provides action-oriented page analysis using Groq Vision model.
 """
 
 import os
 import time
 import base64
-from typing import Optional
+import json
+from typing import Optional, Dict, List
 
 from .config import Config
 
@@ -22,12 +22,14 @@ except ImportError:
 
 class Observer:
     """
-    Visual page observer using Groq Vision model.
-    Describes what's visible on the page to provide context for planning.
+    Action-oriented page observer for ReAct workflow.
+    Analyzes pages to provide context for the Supervisor's next action decision.
     """
     
-    # Screenshot save path
-    SCREENSHOT_PATH = os.path.join(os.path.dirname(__file__), "current_screenshot.png")
+    # Debug file paths
+    DEBUG_DIR = os.path.dirname(__file__)
+    SCREENSHOT_PATH = os.path.join(DEBUG_DIR, "current_screenshot.png")
+    OBSERVATION_PATH = os.path.join(DEBUG_DIR, "last_observation.json")
     
     def __init__(self, api_key: str = None):
         """
@@ -37,9 +39,9 @@ class Observer:
             api_key: Groq API key (uses GROQ_API_KEY3 from config)
         """
         self.client = None
-        self.model_name = Config.GROQ_VISION_MODEL
+        self.model_name = Config.GROQ_OBSERVER_MODEL
         self.available = False
-        self.last_description = None
+        self.last_observation = None
         
         if not GROQ_AVAILABLE:
             print("[Observer] Groq SDK not available")
@@ -53,7 +55,7 @@ class Observer:
             
             self.client = Groq(api_key=api_key)
             self.available = True
-            print("[Observer] Ready (Groq)")
+            print(f"[Observer] Ready ({self.model_name})")
             
         except Exception as e:
             print(f"[Observer] Setup failed: {e}")
@@ -63,28 +65,57 @@ class Observer:
         try:
             with open(self.SCREENSHOT_PATH, 'wb') as f:
                 f.write(screenshot_bytes)
-            print(f"[Observer] Screenshot saved: {self.SCREENSHOT_PATH}")
+            print(f"[Observer] Screenshot saved to current_screenshot.png")
         except Exception as e:
             print(f"[Observer] Failed to save screenshot: {e}")
     
-    def describe_page(self, screenshot_bytes: bytes, save_screenshot: bool = True) -> Optional[str]:
+    def _save_observation(self, observation: Dict):
+        """Save observation JSON to file for debugging."""
+        try:
+            with open(self.OBSERVATION_PATH, 'w', encoding='utf-8') as f:
+                json.dump(observation, f, indent=2, ensure_ascii=False)
+            print(f"[Observer] Observation saved to last_observation.json")
+        except Exception as e:
+            print(f"[Observer] Failed to save observation: {e}")
+    
+    def analyze_for_action(
+        self,
+        screenshot_bytes: bytes,
+        goal: str,
+        last_action: Optional[Dict] = None,
+        last_action_success: Optional[bool] = None
+    ) -> Dict:
         """
-        Analyze a screenshot and return a description of what's visible.
+        Analyze a screenshot with action-oriented focus.
+        
+        This is the primary method for the ReAct workflow. It provides
+        structured analysis that the Supervisor can use to decide the next action.
         
         Args:
             screenshot_bytes: PNG screenshot as bytes
-            save_screenshot: Whether to save screenshot to file
+            goal: The user's goal
+            last_action: The previous action taken (if any)
+            last_action_success: Whether the last action succeeded
             
         Returns:
-            Description of the page, or None on failure
+            Dict with:
+                - page_state: Current page description
+                - blockers: List of detected popups/modals
+                - previous_action_result: Analysis of last action outcome
+                - key_elements: Notable interactive elements
         """
         # Save screenshot for debugging
-        if save_screenshot and screenshot_bytes:
+        if screenshot_bytes:
             self._save_screenshot(screenshot_bytes)
         
         if not self.available:
-            print("[Observer] Not available, returning None")
-            return None
+            print("[Observer] Not available, returning minimal observation")
+            return {
+                "page_state": "Unknown page state",
+                "blockers": [],
+                "previous_action_result": "UNKNOWN",
+                "key_elements": []
+            }
         
         try:
             # Rate limiting
@@ -93,16 +124,185 @@ class Observer:
             # Encode screenshot
             b64_image = base64.b64encode(screenshot_bytes).decode('utf-8')
             
-            prompt = """Describe this webpage screenshot concisely.
+            # Build context about last action
+            last_action_context = ""
+            if last_action:
+                action_type = last_action.get('action', 'unknown')
+                target = last_action.get('target', 'unknown')
+                query = last_action.get('query', '')
+                success_text = "SUCCESS" if last_action_success else "FAILED" if last_action_success is False else "UNKNOWN"
+                last_action_context = f"""
+PREVIOUS ACTION: {action_type} on "{target}" {f'with query "{query}"' if query else ''}
+RESULT: {success_text}
+"""
+            
+            prompt = f"""Analyze this webpage screenshot for a web automation task.
+
+GOAL: {goal}
+{last_action_context}
+
+Provide a DETAILED JSON response with these fields:
+
+1. "page_state": A detailed description of the current page including:
+   - What website this is
+   - What page/section we're on (homepage, search results, product page, video page, etc.)
+   - What content is visible (search results list, video player, product grid, etc.)
+   - General page layout description
+
+2. "blockers": An array of blocking elements that must be handled first:
+   - Popups, modals, overlays
+   - Cookie consent banners
+   - Login/signup prompts
+   - Age verification
+   - Any element covering the main content
+   Empty array if none visible.
+
+3. "previous_action_result": If there was a previous action, analyze if it worked:
+   - "SUCCESS - [detailed evidence]" (e.g., "SUCCESS - search results page now shows results for 'samsung phones', total 48 products visible")
+   - "FAILED - [detailed reason]" (e.g., "FAILED - still on homepage, search was not executed, search bar still empty")
+   - "PARTIAL - [explanation]" (e.g., "PARTIAL - clicked but page is still loading")
+   - "N/A" if no previous action
+
+4. "key_elements": Array of 5-8 notable interactive elements visible that could help achieve the goal:
+   - Be specific with descriptions
+   - Include position hints (top, center, left sidebar, etc.)
+   - For search results: mention product names, video titles, etc.
+   - Example: ["Search bar at top center", "First product: Samsung Galaxy S24 - Rs 74,999", "Filter by Price button on left", "Sort dropdown showing 'Relevance'"]
+
+5. "goal_progress": Brief assessment of how close we are to completing the goal:
+   - "NOT_STARTED" - Haven't begun working on the goal
+   - "IN_PROGRESS" - Working towards the goal
+   - "ALMOST_DONE" - One or two steps away from completion
+   - "COMPLETE" - Goal appears to be achieved
+   - "BLOCKED" - Cannot proceed due to blockers
+
+Example response:
+{{
+    "page_state": "YouTube homepage showing video recommendations grid with trending content. Navigation bar at top with logo, search bar, and user menu. Left sidebar has Home, Shorts, Subscriptions links. Main area shows 4x4 grid of video thumbnails.",
+    "blockers": [],
+    "previous_action_result": "SUCCESS - Successfully navigated to YouTube homepage from blank page",
+    "key_elements": ["Search bar at top center", "First video: 'Top 10 Nature Documentaries'", "Shorts button in left sidebar", "Home button in left sidebar", "Trending section below fold"],
+    "goal_progress": "IN_PROGRESS"
+}}
+
+Respond with ONLY the JSON object, no other text."""
+
+            response = self.client.chat.completions.create(
+                model=self.model_name,
+                messages=[
+                    {
+                        "role": "user",
+                        "content": [
+                            {"type": "text", "text": prompt},
+                            {
+                                "type": "image_url",
+                                "image_url": {"url": f"data:image/png;base64,{b64_image}"}
+                            }
+                        ]
+                    }
+                ],
+                max_tokens=800,
+                temperature=0.2
+            )
+            
+            result_text = response.choices[0].message.content.strip()
+            
+            # Try to parse JSON
+            try:
+                # Handle potential markdown code blocks
+                if result_text.startswith("```"):
+                    result_text = result_text.split("```")[1]
+                    if result_text.startswith("json"):
+                        result_text = result_text[4:]
+                    result_text = result_text.strip()
+                
+                observation = json.loads(result_text)
+                
+                # Validate required fields
+                if "page_state" not in observation:
+                    observation["page_state"] = "Unknown"
+                if "blockers" not in observation:
+                    observation["blockers"] = []
+                if "previous_action_result" not in observation:
+                    observation["previous_action_result"] = "N/A"
+                if "key_elements" not in observation:
+                    observation["key_elements"] = []
+                if "goal_progress" not in observation:
+                    observation["goal_progress"] = "IN_PROGRESS"
+                
+            except json.JSONDecodeError:
+                # Fallback: create structured response from text
+                observation = {
+                    "page_state": result_text[:300],
+                    "blockers": [],
+                    "previous_action_result": "N/A",
+                    "key_elements": [],
+                    "goal_progress": "UNKNOWN"
+                }
+            
+            self.last_observation = observation
+            
+            # Save observation to file
+            self._save_observation(observation)
+            
+            # Print detailed observation for debugging
+            print("\n" + "=" * 60)
+            print("OBSERVER ANALYSIS:")
+            print("=" * 60)
+            print(f"Page State: {observation.get('page_state', 'Unknown')[:200]}...")
+            if observation.get('blockers'):
+                print(f"BLOCKERS DETECTED: {observation['blockers']}")
+            print(f"Previous Action: {observation.get('previous_action_result', 'N/A')}")
+            print(f"Goal Progress: {observation.get('goal_progress', 'UNKNOWN')}")
+            print(f"Key Elements ({len(observation.get('key_elements', []))}):")
+            for i, elem in enumerate(observation.get('key_elements', [])[:5], 1):
+                print(f"  {i}. {elem}")
+            print("=" * 60 + "\n")
+            
+            return observation
+            
+        except Exception as e:
+            print(f"[Observer] Analysis failed: {e}")
+            import traceback
+            traceback.print_exc()
+            return {
+                "page_state": "Analysis failed",
+                "blockers": [],
+                "previous_action_result": "UNKNOWN",
+                "key_elements": [],
+                "goal_progress": "UNKNOWN"
+            }
+    
+    def describe_page(self, screenshot_bytes: bytes, save_screenshot: bool = True) -> Optional[str]:
+        """
+        Legacy method: Simple page description.
+        Kept for backward compatibility.
+        
+        Args:
+            screenshot_bytes: PNG screenshot as bytes
+            save_screenshot: Whether to save screenshot to file
+            
+        Returns:
+            Description of the page, or None on failure
+        """
+        if save_screenshot and screenshot_bytes:
+            self._save_screenshot(screenshot_bytes)
+        
+        if not self.available:
+            return None
+        
+        try:
+            time.sleep(Config.API_DELAY)
+            b64_image = base64.b64encode(screenshot_bytes).decode('utf-8')
+            
+            prompt = """Describe this webpage screenshot in detail.
 Focus on:
 1. What website/page is this?
 2. What is the current state (home page, search results, video playing, etc.)?
-3. What interactive elements are visible (videos, search results, buttons)?
+3. What interactive elements are visible?
+4. Any popups, modals, or blockers?
 
-Keep it brief (2-4 sentences). Example:
-"This is YouTube search results for '4K videos'. Multiple video thumbnails are displayed in a grid. Each video shows title, channel name, and view count. A search bar is visible at the top."
-
-Your description:"""
+Be comprehensive (3-5 sentences)."""
             
             response = self.client.chat.completions.create(
                 model=self.model_name,
@@ -118,81 +318,13 @@ Your description:"""
                         ]
                     }
                 ],
-                max_tokens=300,
+                max_tokens=400,
                 temperature=0.2
             )
             
             description = response.choices[0].message.content.strip()
-            self.last_description = description
-            
-            # Print full context for debugging
-            print("\n" + "=" * 50)
-            print("OBSERVER CONTEXT (passed to planner):")
-            print("=" * 50)
-            print(description)
-            print("=" * 50 + "\n")
-            
             return description
             
         except Exception as e:
-            print(f"[Observer] Failed: {e}")
-            return None
-    
-    def describe_failure_context(
-        self, 
-        screenshot_bytes: bytes, 
-        failed_action: str,
-        failure_reason: str
-    ) -> Optional[str]:
-        """
-        Analyze the page after a failure to provide context for replanning.
-        """
-        if not self.available:
-            return None
-        
-        # Save screenshot
-        if screenshot_bytes:
-            self._save_screenshot(screenshot_bytes)
-        
-        try:
-            time.sleep(Config.API_DELAY)
-            
-            b64_image = base64.b64encode(screenshot_bytes).decode('utf-8')
-            
-            prompt = f"""A web automation action just failed. Analyze this screenshot.
-
-FAILED ACTION: {failed_action}
-FAILURE REASON: {failure_reason}
-
-Answer:
-1. What page is currently displayed?
-2. Why might the action have failed?
-3. What should be tried instead?
-
-Keep response under 4 sentences."""
-            
-            response = self.client.chat.completions.create(
-                model=self.model_name,
-                messages=[
-                    {
-                        "role": "user",
-                        "content": [
-                            {"type": "text", "text": prompt},
-                            {
-                                "type": "image_url",
-                                "image_url": {"url": f"data:image/png;base64,{b64_image}"}
-                            }
-                        ]
-                    }
-                ],
-                max_tokens=200,
-                temperature=0.3
-            )
-            
-            analysis = response.choices[0].message.content.strip()
-            print(f"[Observer] Failure analysis: {analysis}")
-            return analysis
-            
-        except Exception as e:
-            print(f"[Observer] Failure analysis failed: {e}")
+            print(f"[Observer] describe_page failed: {e}")
             return None
