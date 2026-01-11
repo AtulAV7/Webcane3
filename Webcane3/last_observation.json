@@ -1,16 +1,15 @@
 {
-  "page_state": "YouTube video page showing a video titled 'Jaw-Dropping 4K HDR Wildlife | Immersive Animal World in Dolby Vision & 120 fps'. The page includes video player, video title, channel name, and various interactive buttons like like, share, download, and save. Right sidebar shows video recommendations.",
+  "page_state": "YouTube video page showing an error message 'Something went wrong. Refresh or try again later.' in the main content area. The video title 'Avengers: Doomsday - Trailer 4 \"The Wakandans & The Fantastic 4 Will Return\" (Concept)' is visible below the error. Right sidebar shows video recommendations with thumbnails and titles.",
   "blockers": [
-    "Permission dialog box asking to 'Allow microphone access to search with voice' is covering part of the page"
+    "Error message covering the video player"
   ],
-  "previous_action_result": "SUCCESS - advertisement overlay close button was dismissed",
+  "previous_action_result": "FAILED - Video player is not visible due to error message",
   "key_elements": [
-    "Video title: 'Jaw-Dropping 4K HDR Wildlife | Immersive Animal World in Dolby Vision & 120 fps'",
-    "Like button below the video",
-    "Share button below the video",
-    "Download button below the video",
-    "First recommended video: 'Tom & Jerry | Triple Trouble | Classic Cartoon Compilation'",
-    "Permission dialog box with 'Allow' and 'Block' options"
+    "Refresh or try again later link in error message",
+    "Video title: Avengers: Doomsday - Trailer 4",
+    "First recommended video: Dr. Doom Arrives In New York (2025)",
+    "Search bar at top center",
+    "Subscribe button below video title"
   ],
   "goal_progress": "BLOCKED"
 }

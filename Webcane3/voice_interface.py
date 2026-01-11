@@ -1,13 +1,16 @@
 """
 Voice Interface for WebCane3 Accessibility.
 Provides Speech-to-Text (STT) and Text-to-Speech (TTS) for blind users.
-Uses Groq API for both Whisper (STT) and Orpheus (TTS).
+- STT: Uses Groq Whisper API
+- TTS: Uses NVIDIA Riva TTS (Magpie-Multilingual) via gRPC
 """
 
 import os
 import time
 import threading
 import tempfile
+import uuid
+import wave
 from pathlib import Path
 from typing import Optional
 
@@ -28,12 +31,21 @@ try:
 except ImportError:
     PYGAME_AVAILABLE = False
 
-# Groq client
+# Groq client (for STT)
 try:
     from groq import Groq
     GROQ_AVAILABLE = True
 except ImportError:
     GROQ_AVAILABLE = False
+
+# NVIDIA Riva TTS
+try:
+    import riva.client
+    from riva.client.proto.riva_audio_pb2 import AudioEncoding
+    RIVA_AVAILABLE = True
+except ImportError:
+    RIVA_AVAILABLE = False
+    print("[Voice] nvidia-riva-client not installed. Run: pip install nvidia-riva-client")
 
 from .config import Config
 
@@ -41,8 +53,8 @@ from .config import Config
 class VoiceInterface:
     """
     Voice interface for blind users.
-    - STT: Record voice and transcribe to text
-    - TTS: Convert text to speech and play (non-blocking)
+    - STT: Groq Whisper API (cloud)
+    - TTS: NVIDIA Riva Magpie (cloud)
     """
     
     # Voice settings
@@ -50,14 +62,17 @@ class VoiceInterface:
     CHANNELS = 1
     RECORDING_DURATION = 5  # seconds
     
+    # NVIDIA Riva TTS settings
+    RIVA_SERVER = "grpc.nvcf.nvidia.com:443"
+    RIVA_FUNCTION_ID = "877104f7-e885-42b9-8de8-f6e4c6303969"
+    RIVA_VOICE = "Magpie-Multilingual.EN-US.Aria"
+    RIVA_LANGUAGE = "en-US"
+    RIVA_SAMPLE_RATE = 22050
+    
     def __init__(self, api_key: str = None):
-        """
-        Initialize voice interface.
-        
-        Args:
-            api_key: Groq API key (uses GROQ_API_KEY2 from config)
-        """
-        self.client = None
+        """Initialize voice interface with NVIDIA Riva TTS and Groq STT."""
+        self.groq_client = None
+        self.riva_service = None
         self.available = False
         self.tts_available = False
         self.stt_available = False
@@ -65,54 +80,63 @@ class VoiceInterface:
         # Audio file paths
         self.temp_dir = tempfile.gettempdir()
         self.recording_path = os.path.join(self.temp_dir, "webcane_recording.wav")
-        self.speech_path = os.path.join(self.temp_dir, "webcane_speech.wav")
         
-        # Thread-safe flag for TTS queue
-        self._speaking = False
-        self._speech_queue = []
+        # Initialize Groq for STT
+        if GROQ_AVAILABLE:
+            try:
+                stt_key = api_key or Config.GROQ_API_KEY2
+                if stt_key:
+                    self.groq_client = Groq(api_key=stt_key)
+                    self.stt_available = AUDIO_AVAILABLE
+            except Exception as e:
+                print(f"[Voice] Groq STT init failed: {e}")
         
-        if not GROQ_AVAILABLE:
-            print("[Voice] Groq SDK not available")
-            return
+        # Initialize NVIDIA Riva TTS
+        if RIVA_AVAILABLE and PYGAME_AVAILABLE:
+            try:
+                tts_key = Config.NVIDIA_API_TTS
+                if tts_key:
+                    # Create metadata for authentication (list of tuples)
+                    metadata = [
+                        ("function-id", self.RIVA_FUNCTION_ID),
+                        ("authorization", f"Bearer {tts_key}")
+                    ]
+                    
+                    # Create Riva auth with correct parameters
+                    auth = riva.client.Auth(
+                        ssl_root_cert=None,
+                        ssl_client_cert=None,
+                        ssl_client_key=None,
+                        use_ssl=True,
+                        uri=self.RIVA_SERVER,
+                        metadata_args=metadata
+                    )
+                    self.riva_service = riva.client.SpeechSynthesisService(auth)
+                    self.tts_available = True
+                    print("[Voice] NVIDIA Riva TTS ready")
+                else:
+                    print("[Voice] NVIDIA_API_TTS not configured")
+            except Exception as e:
+                print(f"[Voice] NVIDIA Riva TTS init failed: {e}")
         
-        try:
-            api_key = api_key or Config.GROQ_API_KEY2
-            if not api_key:
-                print("[Voice] No Groq API key (GROQ_API_KEY2) provided")
-                return
-            
-            self.client = Groq(api_key=api_key)
-            self.available = True
-            
-            # Check capabilities
-            self.stt_available = AUDIO_AVAILABLE
-            self.tts_available = PYGAME_AVAILABLE
-            
+        # Set overall availability
+        self.available = self.stt_available or self.tts_available
+        
+        if self.available:
             status = []
             if self.stt_available:
                 status.append("STT")
             if self.tts_available:
-                status.append("TTS")
-            
-            if status:
-                print(f"[Voice] Ready ({', '.join(status)})")
-            else:
-                print("[Voice] API ready but audio libraries missing")
-                
-        except Exception as e:
-            print(f"[Voice] Setup failed: {e}")
+                status.append("TTS-Riva")
+            print(f"[Voice] Ready ({', '.join(status)})")
+        else:
+            print("[Voice] Not available - missing dependencies or API keys")
     
     def listen(self, duration: float = None) -> Optional[str]:
         """
-        Record audio and transcribe to text.
-        
-        Args:
-            duration: Recording duration in seconds (default: 5)
-            
-        Returns:
-            Transcribed text, or None on failure
+        Record audio and transcribe to text using Groq Whisper.
         """
-        if not self.available or not self.stt_available:
+        if not self.stt_available or not self.groq_client:
             print("[Voice] STT not available")
             return None
         
@@ -134,9 +158,9 @@ class VoiceInterface:
             sf.write(self.recording_path, recording, self.SAMPLE_RATE)
             print("[Voice] Recording complete, transcribing...")
             
-            # Transcribe with Whisper
+            # Transcribe with Whisper via Groq
             with open(self.recording_path, "rb") as audio_file:
-                transcription = self.client.audio.transcriptions.create(
+                transcription = self.groq_client.audio.transcriptions.create(
                     file=(self.recording_path, audio_file.read()),
                     model="whisper-large-v3-turbo",
                     temperature=0,
@@ -153,29 +177,23 @@ class VoiceInterface:
     
     def speak(self, text: str, blocking: bool = False):
         """
-        Convert text to speech and play.
+        Convert text to speech using NVIDIA Riva TTS.
         Non-blocking by default - audio plays in background.
-        
-        Args:
-            text: Text to speak
-            blocking: If True, wait for audio to finish
         """
-        if not self.available:
+        if not self.tts_available:
             print(f"[Voice] (would say): {text}")
             return
         
         if blocking:
             self._speak_sync(text)
         else:
-            # Run in background thread
             thread = threading.Thread(target=self._speak_sync, args=(text,))
             thread.daemon = True
             thread.start()
     
     def _speak_sync(self, text: str):
-        """Synchronous TTS - generates and plays audio."""
-        # Use unique temp file for each TTS call to avoid lock conflicts
-        import uuid
+        """Synchronous TTS using NVIDIA Riva."""
+        # Use unique temp file for each TTS call
         unique_speech_path = os.path.join(self.temp_dir, f"webcane_speech_{uuid.uuid4().hex[:8]}.wav")
         
         try:
@@ -188,17 +206,21 @@ class VoiceInterface:
                     pass
                 time.sleep(0.1)
             
-            # Generate speech using Groq Orpheus (speed 1.25 = slightly faster)
-            response = self.client.audio.speech.create(
-                model="canopylabs/orpheus-v1-english",
-                voice="autumn",
-                response_format="wav",
-                input=text,
-                speed=1.25  # Slightly faster (range: 0.5 to 5.0)
+            # Generate speech with NVIDIA Riva
+            resp = self.riva_service.synthesize(
+                text,
+                self.RIVA_VOICE,
+                self.RIVA_LANGUAGE,
+                sample_rate_hz=self.RIVA_SAMPLE_RATE,
+                encoding=AudioEncoding.LINEAR_PCM
             )
             
-            # Save to unique file
-            response.write_to_file(unique_speech_path)
+            # Write to WAV file
+            with wave.open(unique_speech_path, 'wb') as wf:
+                wf.setnchannels(1)
+                wf.setsampwidth(2)  # 16-bit
+                wf.setframerate(self.RIVA_SAMPLE_RATE)
+                wf.writeframesraw(resp.audio)
             
             # Play audio
             if PYGAME_AVAILABLE:
@@ -213,35 +235,24 @@ class VoiceInterface:
                 pygame.mixer.music.unload()
                 time.sleep(0.1)
                 
-                # Try to delete temp file
+                # Delete temp file
                 try:
                     os.remove(unique_speech_path)
                 except:
                     pass
-            else:
-                print(f"[Voice] Audio saved to {unique_speech_path}")
-                
+                    
         except Exception as e:
-            # Don't crash on TTS errors - just print and continue
             error_msg = str(e)
-            if "terms acceptance" in error_msg.lower():
-                print(f"[Voice] TTS model requires terms acceptance on Groq console")
-            elif "permission" in error_msg.lower():
-                print(f"[Voice] TTS file permission issue - continuing")
-            else:
-                print(f"[Voice] TTS error (continuing without audio): {error_msg[:100]}")
+            # Try to get details if available
+            try:
+                error_msg = e.details()
+            except:
+                pass
+            print(f"[Voice] TTS error: {error_msg}")
     
     def speak_status(self, action: str, target: str = "", success: bool = None):
-        """
-        Speak a formatted status message.
-        
-        Args:
-            action: Action type (navigating, searching, clicking, etc.)
-            target: Target of the action
-            success: Whether the action succeeded (None = in progress)
-        """
+        """Speak a formatted status message."""
         if success is None:
-            # In progress
             if action == "navigating":
                 self.speak(f"Navigating to {target}")
             elif action == "searching":
@@ -266,7 +277,5 @@ class VoiceInterface:
         try:
             if os.path.exists(self.recording_path):
                 os.remove(self.recording_path)
-            if os.path.exists(self.speech_path):
-                os.remove(self.speech_path)
         except:
             pass

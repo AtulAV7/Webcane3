@@ -18,10 +18,11 @@ class Config:
     # API Keys - Separate keys for different components to avoid quota issues
     GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
     GROQ_API_KEY: str = os.getenv("GROQ_API_KEY", "")          # DOM Text Agent
-    GROQ_API_KEY2: str = os.getenv("GROQ_API_KEY2", "")        # (Legacy - was Verification)
+    GROQ_API_KEY2: str = os.getenv("GROQ_API_KEY2", "")        # STT (Whisper)
     GROQ_API_KEY3: str = os.getenv("GROQ_API_KEY3", "")        # Observer Agent
     NVIDIA_API_KEY: str = os.getenv("NVIDIA_API_KEY", "")      # Vision Agent
     NVIDIA_API_KEY2: str = os.getenv("NVIDIA_API_KEY2", "")    # Supervisor (DeepSeek)
+    NVIDIA_API_TTS: str = os.getenv("NVIDIA_API_TTS", "")      # TTS (Riva Magpie)
     
     # Model Names - Gemini (used for planning fallback)
     GEMINI_PLANNING_MODEL: str = "gemini-2.5-flash"
