@@ -1,13 +1,16 @@
 {
-  "page_state": "Pinterest homepage showing featured content and categories. Navigation bar at top with logo, search bar, and login/signup buttons. Main area has 'Explore the best of Pinterest' section with three promotional cards, followed by 'Browse by category' section with various category cards.",
-  "blockers": [],
-  "previous_action_result": "N/A",
-  "key_elements": [
-    "Search bar at top center",
-    "First promotional card: 'Micro rituals to calm you'",
-    "Category card: Animals",
-    "Category card: Food And Drink",
-    "Category card: Art"
+  "page_state": "YouTube video page showing a video titled 'Jaw-Dropping 4K HDR Wildlife | Immersive Animal World in Dolby Vision & 120 fps'. The page includes video player, video title, channel name, and various interactive buttons like like, share, download, and save. Right sidebar shows video recommendations.",
+  "blockers": [
+    "Permission dialog box asking to 'Allow microphone access to search with voice' is covering part of the page"
   ],
-  "goal_progress": "NOT_STARTED"
+  "previous_action_result": "SUCCESS - advertisement overlay close button was dismissed",
+  "key_elements": [
+    "Video title: 'Jaw-Dropping 4K HDR Wildlife | Immersive Animal World in Dolby Vision & 120 fps'",
+    "Like button below the video",
+    "Share button below the video",
+    "Download button below the video",
+    "First recommended video: 'Tom & Jerry | Triple Trouble | Classic Cartoon Compilation'",
+    "Permission dialog box with 'Allow' and 'Block' options"
+  ],
+  "goal_progress": "BLOCKED"
 }

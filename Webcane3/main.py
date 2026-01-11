@@ -151,6 +151,11 @@ class WebCane:
                             last_action=state.get("last_action"),
                             last_action_success=state.get("last_action_success")
                         )
+                        
+                        # Voice feedback for observation (summarize what's on screen)
+                        if self.voice and observation.get("page_state"):
+                            page_summary = observation["page_state"][:150]  # First 150 chars
+                            self.voice.speak(f"I see: {page_summary}")
                     
             except Exception as e:
                 print(f"[Observe] Error: {e}")

@@ -97,7 +97,7 @@ def main():
             goal_lower = goal.lower()
             stop_words = ['quit', 'exit', 'stop', 'close', 'end', 'bye', 'goodbye']
             stop_phrases = ['stop session', 'end session', 'stop the session', 'close session', 
-                           'stop running', 'stop the program', 'terminate', 'shut down']
+                           'stop running', 'stop the program', 'terminate', 'shut down','stop']
             
             should_stop = (
                 goal_lower in stop_words or
