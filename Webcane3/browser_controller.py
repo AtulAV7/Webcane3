@@ -278,12 +278,15 @@ class BrowserController:
             self.page.mouse.click(center_x, center_y)
             self.page.wait_for_timeout(500)
             
-            # Check if new tab opened
+            # Check if new tab opened (with retry for slow tabs)
             if self.browser:
-                pages_after = self.browser.contexts[0].pages
-                if len(pages_after) > pages_before:
-                    # Switch to newest tab
-                    self._switch_to_newest_tab()
+                for _ in range(3):  # Check multiple times
+                    pages_after = self.browser.contexts[0].pages
+                    if len(pages_after) > pages_before:
+                        # Switch to newest tab
+                        self._switch_to_newest_tab()
+                        break
+                    self.page.wait_for_timeout(300)  # Wait and check again
             
             print(f"[Browser] Clicked element {element_id} at ({center_x:.0f}, {center_y:.0f})")
             return True

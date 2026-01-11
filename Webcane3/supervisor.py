@@ -216,14 +216,12 @@ Output ONLY a valid JSON object. No explanation."""
                     if decision.get('action') != 'FAILED':
                         print("[Supervisor] Extracted decision from reasoning content")
                     else:
-                        # If reasoning mentions COMPLETE, assume goal achieved
-                        if 'complete' in reasoning_content.lower() and 'goal' in reasoning_content.lower():
-                            decision = {"action": "COMPLETE", "reason": "Goal appears complete based on reasoning"}
-                        else:
-                            # Fall back to checking URL for completion
-                            decision = {"action": "FAILED", "reason": "Empty supervisor response"}
+                        # Use fallback decision - DO NOT assume COMPLETE
+                        # The reasoning might just be analyzing the goal, not saying it's done
+                        print("[Supervisor] Using fallback decision logic...")
+                        decision = self._fallback_decision(goal, observation, blockers)
                 else:
-                    decision = {"action": "FAILED", "reason": "Empty supervisor response"}
+                    decision = self._fallback_decision(goal, observation, blockers)
             else:
                 # Parse JSON response
                 decision = self._parse_decision(response_content)

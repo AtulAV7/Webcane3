@@ -125,6 +125,9 @@ class WebCane:
             
             try:
                 if self.browser.page:
+                    # Check for new tabs and switch if needed
+                    self.browser.check_for_new_tabs()
+                    
                     page_info = self.browser.get_page_info()
                     current_url = page_info.get("url", current_url)
                     print(f"[Observe] Current URL: {current_url}")

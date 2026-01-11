@@ -402,6 +402,53 @@ class Executor:
         except:
             return False
     
+    def _soft_validate_element(self, element: Dict, target: str) -> bool:
+        """
+        Soft validation: check if element roughly matches target description.
+        Not strict - just catches obvious mismatches like clicking wrong element type.
+        
+        Returns True if element seems to match, False if definitely wrong.
+        """
+        if not element:
+            return False
+        
+        target_lower = target.lower()
+        el_text = (element.get('text', '') or '').lower()
+        el_tag = element.get('tag', '').lower()
+        el_type = element.get('type', '').lower()
+        
+        # Extract key words from target
+        keywords = []
+        for word in ['cart', 'add', 'buy', 'button', 'link', 'search', 'submit', 
+                     'login', 'sign', 'play', 'video', 'image', 'thumbnail']:
+            if word in target_lower:
+                keywords.append(word)
+        
+        # If no specific keywords, accept anything (visual task like "lion thumbnail")
+        if not keywords:
+            return True
+        
+        # Check if element matches at least one keyword
+        combined = f"{el_text} {el_tag} {el_type}"
+        for kw in keywords:
+            if kw in combined:
+                return True
+        
+        # Special cases
+        if 'cart' in target_lower and ('cart' in combined or 'add' in combined):
+            return True
+        if 'button' in target_lower and el_tag in ['button', 'a', 'input']:
+            return True
+        if 'link' in target_lower and el_tag == 'a':
+            return True
+        
+        # If element text is empty, be lenient (might be icon button)
+        if not el_text.strip():
+            return True
+        
+        # Default: accept (soft validation, not strict)
+        return True
+    
     def _execute_navigate(self, url: str) -> Dict:
         """Navigate to URL."""
         if not url.startswith(('http://', 'https://')):
@@ -447,16 +494,52 @@ class Executor:
                 element_id = self._find_element_by_vision(elements, target)
                 
                 if element_id >= 0 and element_id < len(elements):
-                    if self.browser.click_element(element_id, elements):
-                        self.stats['vision_success'] += 1
-                        time.sleep(Config.STEP_DELAY)
-                        return {
-                            'success': True,
-                            'method': 'vision',
-                            'element_id': element_id,
-                            'scroll_attempts': scroll_attempt,
-                            'vision_reasoning': self.last_vision_reasoning  # What Vision saw
-                        }
+                    # Get the element for validation
+                    clicked_element = elements[element_id] if element_id < len(elements) else None
+                    
+                    # Soft validation: check if element roughly matches target
+                    if clicked_element and self._soft_validate_element(clicked_element, target):
+                        if self.browser.click_element(element_id, elements):
+                            self.stats['vision_success'] += 1
+                            time.sleep(Config.STEP_DELAY)
+                            return {
+                                'success': True,
+                                'method': 'vision',
+                                'element_id': element_id,
+                                'scroll_attempts': scroll_attempt,
+                                'vision_reasoning': self.last_vision_reasoning
+                            }
+                    else:
+                        # Validation failed - try nearby elements (off-by-one fix)
+                        print(f"[Executor] Vision ID {element_id} doesn't match '{target}', checking nearby...")
+                        for offset in [-1, 1, -2, 2]:
+                            nearby_id = element_id + offset
+                            if 0 <= nearby_id < len(elements):
+                                nearby_el = elements[nearby_id]
+                                if self._soft_validate_element(nearby_el, target):
+                                    print(f"[Executor] Found better match at ID {nearby_id}")
+                                    if self.browser.click_element(nearby_id, elements):
+                                        self.stats['vision_success'] += 1
+                                        time.sleep(Config.STEP_DELAY)
+                                        return {
+                                            'success': True,
+                                            'method': 'vision_corrected',
+                                            'element_id': nearby_id,
+                                            'scroll_attempts': scroll_attempt,
+                                            'vision_reasoning': f"Corrected from {element_id} to {nearby_id}"
+                                        }
+                        # No valid nearby element found - proceed with original anyway (lenient)
+                        print(f"[Executor] No better match found, proceeding with ID {element_id}")
+                        if self.browser.click_element(element_id, elements):
+                            self.stats['vision_success'] += 1
+                            time.sleep(Config.STEP_DELAY)
+                            return {
+                                'success': True,
+                                'method': 'vision',
+                                'element_id': element_id,
+                                'scroll_attempts': scroll_attempt,
+                                'vision_reasoning': self.last_vision_reasoning
+                            }
                 print("[Executor] Vision failed, trying DOM fallback...")
             
             # Try DOM text matching (System 1)

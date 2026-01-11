@@ -1,800 +1,338 @@
 [
   {
     "id": 0,
-    "tag": "button",
-    "text": "Guide",
+    "tag": "a",
+    "text": "View",
     "type": "button",
     "bbox": {
-      "x": 24,
-      "y": 16,
-      "w": 24,
-      "h": 24
-    },
-    "html_id": "button",
-    "html_classes": "style-scope yt-icon-button"
-  },
-  {
-    "id": 1,
-    "tag": "button",
-    "text": "Clear search query",
-    "type": "button",
-    "bbox": {
-      "x": 894,
-      "y": 8,
+      "x": 1057,
+      "y": 354,
       "w": 40,
-      "h": 40
-    },
-    "html_id": "",
-    "html_classes": "ytSearchboxComponentClearButton"
-  },
-  {
-    "id": 2,
-    "tag": "button",
-    "text": "Search",
-    "type": "button",
-    "bbox": {
-      "x": 930,
-      "y": 8,
-      "w": 64,
-      "h": 40
-    },
-    "html_id": "",
-    "html_classes": "ytSearchboxComponentSearchButton"
-  },
-  {
-    "id": 3,
-    "tag": "button",
-    "text": "Search with your voice",
-    "type": "button",
-    "bbox": {
-      "x": 1010,
-      "y": 8,
-      "w": 40,
-      "h": 40
-    },
-    "html_id": "",
-    "html_classes": "yt-spec-button-shape-next yt-spec-button-shape-next--text yt-spec-button-shape-next--mono yt-spec-button-shape-next--size-m yt-spec-button-shape-next--icon-only-default yt-spec-button-shape-next--enable-backdrop-filter-experiment"
-  },
-  {
-    "id": 4,
-    "tag": "button",
-    "text": "Settings",
-    "type": "button",
-    "bbox": {
-      "x": 1271,
-      "y": 16,
-      "w": 24,
-      "h": 24
-    },
-    "html_id": "button",
-    "html_classes": "style-scope yt-icon-button"
-  },
-  {
-    "id": 5,
-    "tag": "button",
-    "text": "Play keyboard shortcut k",
-    "type": "button",
-    "bbox": {
-      "x": 28,
-      "y": 568,
-      "w": 40,
-      "h": 40
-    },
-    "html_id": "",
-    "html_classes": "ytp-play-button ytp-button ytp-play-button-playlist"
-  },
-  {
-    "id": 6,
-    "tag": "button",
-    "text": "Mute (m)",
-    "type": "button",
-    "bbox": {
-      "x": 192,
-      "y": 568,
-      "w": 40,
-      "h": 40
-    },
-    "html_id": "",
-    "html_classes": "ytp-volume-icon ytp-button"
-  },
-  {
-    "id": 7,
-    "tag": "button",
-    "text": "Subtitles/closed captions unavailable",
-    "type": "button",
-    "bbox": {
-      "x": 783,
-      "y": 568,
-      "w": 48,
-      "h": 40
-    },
-    "html_id": "",
-    "html_classes": "ytp-subtitles-button ytp-button"
-  },
-  {
-    "id": 8,
-    "tag": "button",
-    "text": "Settings",
-    "type": "button",
-    "bbox": {
-      "x": 831,
-      "y": 568,
-      "w": 48,
-      "h": 40
-    },
-    "html_id": "",
-    "html_classes": "ytp-button ytp-settings-button"
-  },
-  {
-    "id": 9,
-    "tag": "button",
-    "text": "Theater mode (t)",
-    "type": "button",
-    "bbox": {
-      "x": 879,
-      "y": 568,
-      "w": 48,
-      "h": 40
-    },
-    "html_id": "",
-    "html_classes": "ytp-size-button ytp-button"
-  },
-  {
-    "id": 10,
-    "tag": "button",
-    "text": "Full screen (f)",
-    "type": "button",
-    "bbox": {
-      "x": 927,
-      "y": 568,
-      "w": 48,
-      "h": 40
-    },
-    "html_id": "",
-    "html_classes": "ytp-fullscreen-button ytp-button"
-  },
-  {
-    "id": 11,
-    "tag": "button",
-    "text": "Subscribe to 8K Clarity.",
-    "type": "button",
-    "bbox": {
-      "x": 189,
-      "y": 668,
-      "w": 95,
-      "h": 36
-    },
-    "html_id": "",
-    "html_classes": "yt-spec-button-shape-next yt-spec-button-shape-next--filled yt-spec-button-shape-next--mono yt-spec-button-shape-next--size-m yt-spec-button-shape-next--enable-backdrop-filter-experiment"
-  },
-  {
-    "id": 12,
-    "tag": "button",
-    "text": "like this video along with 421 other people",
-    "type": "button",
-    "bbox": {
-      "x": 486,
-      "y": 668,
-      "w": 80,
-      "h": 36
-    },
-    "html_id": "",
-    "html_classes": "yt-spec-button-shape-next yt-spec-button-shape-next--tonal yt-spec-button-shape-next--mono yt-spec-button-shape-next--size-m yt-spec-button-shape-next--icon-leading yt-spec-button-shape-next--segmented-start yt-spec-button-shape-next--enable-backdrop-filter-experiment"
-  },
-  {
-    "id": 13,
-    "tag": "button",
-    "text": "Dislike this video",
-    "type": "button",
-    "bbox": {
-      "x": 566,
-      "y": 668,
-      "w": 52,
-      "h": 36
-    },
-    "html_id": "",
-    "html_classes": "yt-spec-button-shape-next yt-spec-button-shape-next--tonal yt-spec-button-shape-next--mono yt-spec-button-shape-next--size-m yt-spec-button-shape-next--icon-button yt-spec-button-shape-next--segmented-end yt-spec-button-shape-next--enable-backdrop-filter-experiment"
-  },
-  {
-    "id": 14,
-    "tag": "button",
-    "text": "Share",
-    "type": "button",
-    "bbox": {
-      "x": 626,
-      "y": 668,
-      "w": 92,
-      "h": 36
-    },
-    "html_id": "",
-    "html_classes": "yt-spec-button-shape-next yt-spec-button-shape-next--tonal yt-spec-button-shape-next--mono yt-spec-button-shape-next--size-m yt-spec-button-shape-next--icon-leading yt-spec-button-shape-next--enable-backdrop-filter-experiment"
-  },
-  {
-    "id": 15,
-    "tag": "button",
-    "text": "Download",
-    "type": "button",
-    "bbox": {
-      "x": 726,
-      "y": 668,
-      "w": 118,
-      "h": 36
-    },
-    "html_id": "",
-    "html_classes": "yt-spec-button-shape-next yt-spec-button-shape-next--tonal yt-spec-button-shape-next--size-m yt-spec-button-shape-next--disabled yt-spec-button-shape-next--icon-leading yt-spec-button-shape-next--enable-backdrop-filter-experiment"
-  },
-  {
-    "id": 16,
-    "tag": "button",
-    "text": "Save to playlist",
-    "type": "button",
-    "bbox": {
-      "x": 861,
-      "y": 668,
-      "w": 86,
-      "h": 36
-    },
-    "html_id": "",
-    "html_classes": "yt-spec-button-shape-next yt-spec-button-shape-next--tonal yt-spec-button-shape-next--mono yt-spec-button-shape-next--size-m yt-spec-button-shape-next--icon-leading yt-spec-button-shape-next--enable-backdrop-filter-experiment"
-  },
-  {
-    "id": 17,
-    "tag": "button",
-    "text": "More actions",
-    "type": "button",
-    "bbox": {
-      "x": 955,
-      "y": 668,
-      "w": 36,
-      "h": 36
-    },
-    "html_id": "",
-    "html_classes": "yt-spec-button-shape-next yt-spec-button-shape-next--tonal yt-spec-button-shape-next--mono yt-spec-button-shape-next--size-m yt-spec-button-shape-next--icon-button yt-spec-button-shape-next--enable-backdrop-filter-experiment"
-  },
-  {
-    "id": 18,
-    "tag": "button",
-    "text": "Expand",
-    "type": "button",
-    "bbox": {
-      "x": 1362,
-      "y": 82,
-      "w": 40,
-      "h": 40
-    },
-    "html_id": "button",
-    "html_classes": "style-scope yt-icon-button"
-  },
-  {
-    "id": 19,
-    "tag": "button",
-    "text": "My Ad Center",
-    "type": "button",
-    "bbox": {
-      "x": 1364,
-      "y": 248,
-      "w": 36,
-      "h": 36
-    },
-    "html_id": "",
-    "html_classes": "yt-spec-button-shape-next yt-spec-button-shape-next--text yt-spec-button-shape-next--mono yt-spec-button-shape-next--size-m yt-spec-button-shape-next--icon-button yt-spec-button-shape-next--enable-backdrop-filter-experiment"
-  },
-  {
-    "id": 20,
-    "tag": "button",
-    "text": "More actions",
-    "type": "button",
-    "bbox": {
-      "x": 1383,
-      "y": 307,
-      "w": 36,
-      "h": 36
-    },
-    "html_id": "",
-    "html_classes": "yt-spec-button-shape-next yt-spec-button-shape-next--text yt-spec-button-shape-next--mono yt-spec-button-shape-next--size-m yt-spec-button-shape-next--icon-button yt-spec-button-shape-next--enable-backdrop-filter-experiment"
-  },
-  {
-    "id": 21,
-    "tag": "button",
-    "text": "More actions",
-    "type": "button",
-    "bbox": {
-      "x": 1383,
-      "y": 410,
-      "w": 36,
-      "h": 36
-    },
-    "html_id": "",
-    "html_classes": "yt-spec-button-shape-next yt-spec-button-shape-next--text yt-spec-button-shape-next--mono yt-spec-button-shape-next--size-m yt-spec-button-shape-next--icon-button yt-spec-button-shape-next--enable-backdrop-filter-experiment"
-  },
-  {
-    "id": 22,
-    "tag": "button",
-    "text": "More actions",
-    "type": "button",
-    "bbox": {
-      "x": 1383,
-      "y": 512,
-      "w": 36,
-      "h": 36
-    },
-    "html_id": "",
-    "html_classes": "yt-spec-button-shape-next yt-spec-button-shape-next--text yt-spec-button-shape-next--mono yt-spec-button-shape-next--size-m yt-spec-button-shape-next--icon-button yt-spec-button-shape-next--enable-backdrop-filter-experiment"
-  },
-  {
-    "id": 23,
-    "tag": "button",
-    "text": "More actions",
-    "type": "button",
-    "bbox": {
-      "x": 1383,
-      "y": 615,
-      "w": 36,
-      "h": 36
-    },
-    "html_id": "",
-    "html_classes": "yt-spec-button-shape-next yt-spec-button-shape-next--text yt-spec-button-shape-next--mono yt-spec-button-shape-next--size-m yt-spec-button-shape-next--icon-button yt-spec-button-shape-next--enable-backdrop-filter-experiment"
-  },
-  {
-    "id": 24,
-    "tag": "button",
-    "text": "More actions",
-    "type": "button",
-    "bbox": {
-      "x": 1383,
-      "y": 717,
-      "w": 36,
-      "h": 36
-    },
-    "html_id": "",
-    "html_classes": "yt-spec-button-shape-next yt-spec-button-shape-next--text yt-spec-button-shape-next--mono yt-spec-button-shape-next--size-m yt-spec-button-shape-next--icon-button yt-spec-button-shape-next--enable-backdrop-filter-experiment"
-  },
-  {
-    "id": 25,
-    "tag": "button",
-    "text": "More actions",
-    "type": "button",
-    "bbox": {
-      "x": 1383,
-      "y": 820,
-      "w": 36,
-      "h": 36
-    },
-    "html_id": "",
-    "html_classes": "yt-spec-button-shape-next yt-spec-button-shape-next--text yt-spec-button-shape-next--mono yt-spec-button-shape-next--size-m yt-spec-button-shape-next--icon-button yt-spec-button-shape-next--enable-backdrop-filter-experiment"
-  },
-  {
-    "id": 26,
-    "tag": "a",
-    "text": "YouTube Home",
-    "type": "button",
-    "bbox": {
-      "x": 56,
-      "y": 0,
-      "w": 123,
-      "h": 56
-    },
-    "html_id": "logo",
-    "html_classes": "yt-simple-endpoint style-scope ytd-topbar-logo-renderer"
-  },
-  {
-    "id": 27,
-    "tag": "a",
-    "text": "",
-    "type": "button",
-    "bbox": {
-      "x": 1263,
-      "y": 8,
-      "w": 40,
-      "h": 40
-    },
-    "html_id": "",
-    "html_classes": "yt-simple-endpoint style-scope ytd-topbar-menu-button-renderer"
-  },
-  {
-    "id": 28,
-    "tag": "a",
-    "text": "Sign in",
-    "type": "button",
-    "bbox": {
-      "x": 1311,
-      "y": 10,
-      "w": 98,
-      "h": 36
-    },
-    "html_id": "",
-    "html_classes": "yt-spec-button-shape-next yt-spec-button-shape-next--outline yt-spec-button-shape-next--call-to-action yt-spec-button-shape-next--size-m yt-spec-button-shape-next--icon-leading yt-spec-button-shape-next--enable-backdrop-filter-experiment"
-  },
-  {
-    "id": 29,
-    "tag": "a",
-    "text": "",
-    "type": "button",
-    "bbox": {
-      "x": 16,
-      "y": 68,
-      "w": 975,
-      "h": 548
-    },
-    "html_id": "thumbnail",
-    "html_classes": "yt-simple-endpoint inline-block style-scope ytd-thumbnail"
-  },
-  {
-    "id": 30,
-    "tag": "a",
-    "text": "Learn more",
-    "type": "button",
-    "bbox": {
-      "x": 317,
-      "y": 341,
-      "w": 112,
-      "h": 26
-    },
-    "html_id": "",
-    "html_classes": "ytp-error-link"
-  },
-  {
-    "id": 31,
-    "tag": "a",
-    "text": "Replay",
-    "type": "button",
-    "bbox": {
-      "x": 76,
-      "y": 568,
-      "w": 52,
-      "h": 40
-    },
-    "html_id": "",
-    "html_classes": "ytp-prev-button ytp-button"
-  },
-  {
-    "id": 32,
-    "tag": "a",
-    "text": "Next keyboard shortcut SHIFT+n",
-    "type": "button",
-    "bbox": {
-      "x": 128,
-      "y": 568,
-      "w": 52,
-      "h": 40
-    },
-    "html_id": "",
-    "html_classes": "ytp-next-button ytp-button ytp-playlist-ui"
-  },
-  {
-    "id": 33,
-    "tag": "a",
-    "text": "",
-    "type": "button",
-    "bbox": {
-      "x": 16,
-      "y": 664,
-      "w": 52,
-      "h": 42
-    },
-    "html_id": "",
-    "html_classes": "yt-simple-endpoint style-scope ytd-video-owner-renderer"
-  },
-  {
-    "id": 34,
-    "tag": "a",
-    "text": "8K Clarity",
-    "type": "button",
-    "bbox": {
-      "x": 68,
-      "y": 666,
-      "w": 71,
       "h": 22
     },
     "html_id": "",
-    "html_classes": "yt-simple-endpoint style-scope yt-formatted-string"
+    "html_classes": ""
   },
   {
-    "id": 35,
+    "id": 1,
     "tag": "a",
-    "text": "#8K",
+    "text": "View",
     "type": "button",
     "bbox": {
-      "x": 205,
-      "y": 731,
-      "w": 25,
-      "h": 20
+      "x": 1057,
+      "y": 410,
+      "w": 40,
+      "h": 22
     },
     "html_id": "",
-    "html_classes": "yt-simple-endpoint style-scope yt-formatted-string"
+    "html_classes": ""
   },
   {
-    "id": 36,
-    "tag": "a",
-    "text": "#HDR",
-    "type": "button",
-    "bbox": {
-      "x": 234,
-      "y": 731,
-      "w": 36,
-      "h": 20
-    },
-    "html_id": "",
-    "html_classes": "yt-simple-endpoint style-scope yt-formatted-string"
-  },
-  {
-    "id": 37,
-    "tag": "a",
-    "text": "#DolbyVision",
-    "type": "button",
-    "bbox": {
-      "x": 273,
-      "y": 731,
-      "w": 83,
-      "h": 20
-    },
-    "html_id": "",
-    "html_classes": "yt-simple-endpoint style-scope yt-formatted-string"
-  },
-  {
-    "id": 38,
-    "tag": "a",
-    "text": "Play now",
-    "type": "button",
-    "bbox": {
-      "x": 1268,
-      "y": 248,
-      "w": 88,
-      "h": 36
-    },
-    "html_id": "",
-    "html_classes": "yt-spec-button-shape-next yt-spec-button-shape-next--tonal yt-spec-button-shape-next--mono yt-spec-button-shape-next--size-m yt-spec-button-shape-next--enable-backdrop-filter-experiment"
-  },
-  {
-    "id": 39,
-    "tag": "a",
-    "text": "38:28",
-    "type": "button",
-    "bbox": {
-      "x": 1007,
-      "y": 313,
-      "w": 176,
-      "h": 95
-    },
-    "html_id": "",
-    "html_classes": "yt-lockup-view-model__content-image"
-  },
-  {
-    "id": 40,
-    "tag": "a",
-    "text": "Yellowstone Musical 8K UHD, Dancing Geysers w Ambient, Cinematic and Classical Beautiful Music. 38 m",
-    "type": "button",
-    "bbox": {
-      "x": 1183,
-      "y": 313,
-      "w": 226,
-      "h": 40
-    },
-    "html_id": "",
-    "html_classes": "yt-lockup-metadata-view-model__title"
-  },
-  {
-    "id": 41,
-    "tag": "a",
-    "text": "26:08",
-    "type": "button",
-    "bbox": {
-      "x": 1007,
-      "y": 416,
-      "w": 176,
-      "h": 95
-    },
-    "html_id": "",
-    "html_classes": "yt-lockup-view-model__content-image"
-  },
-  {
-    "id": 42,
-    "tag": "a",
-    "text": "8k HDR Best Mix 2022 Dolby Vision 26 minutes",
-    "type": "button",
-    "bbox": {
-      "x": 1183,
-      "y": 416,
-      "w": 226,
-      "h": 40
-    },
-    "html_id": "",
-    "html_classes": "yt-lockup-metadata-view-model__title"
-  },
-  {
-    "id": 43,
-    "tag": "a",
-    "text": "20:02",
-    "type": "button",
-    "bbox": {
-      "x": 1007,
-      "y": 518,
-      "w": 176,
-      "h": 95
-    },
-    "html_id": "",
-    "html_classes": "yt-lockup-view-model__content-image"
-  },
-  {
-    "id": 44,
-    "tag": "a",
-    "text": "Next-Level Display OLED Test Demo | 8K HDR 120FPS Dolby Vision for Modern TVs 20 minutes",
-    "type": "button",
-    "bbox": {
-      "x": 1183,
-      "y": 518,
-      "w": 226,
-      "h": 40
-    },
-    "html_id": "",
-    "html_classes": "yt-lockup-metadata-view-model__title"
-  },
-  {
-    "id": 45,
-    "tag": "a",
-    "text": "33:14",
-    "type": "button",
-    "bbox": {
-      "x": 1007,
-      "y": 621,
-      "w": 176,
-      "h": 95
-    },
-    "html_id": "",
-    "html_classes": "yt-lockup-view-model__content-image"
-  },
-  {
-    "id": 46,
-    "tag": "a",
-    "text": "Ambient light zone testing CW multi-color 33 minutes",
-    "type": "button",
-    "bbox": {
-      "x": 1183,
-      "y": 621,
-      "w": 226,
-      "h": 40
-    },
-    "html_id": "",
-    "html_classes": "yt-lockup-metadata-view-model__title"
-  },
-  {
-    "id": 47,
-    "tag": "a",
-    "text": "36:37",
-    "type": "button",
-    "bbox": {
-      "x": 1007,
-      "y": 723,
-      "w": 176,
-      "h": 95
-    },
-    "html_id": "",
-    "html_classes": "yt-lockup-view-model__content-image"
-  },
-  {
-    "id": 48,
-    "tag": "a",
-    "text": "100 Natural Wonders of the World [Amazing Places 4K] 36 minutes",
-    "type": "button",
-    "bbox": {
-      "x": 1183,
-      "y": 723,
-      "w": 226,
-      "h": 40
-    },
-    "html_id": "",
-    "html_classes": "yt-lockup-metadata-view-model__title"
-  },
-  {
-    "id": 49,
-    "tag": "a",
-    "text": "18:56",
-    "type": "button",
-    "bbox": {
-      "x": 1007,
-      "y": 826,
-      "w": 176,
-      "h": 95
-    },
-    "html_id": "",
-    "html_classes": "yt-lockup-view-model__content-image"
-  },
-  {
-    "id": 50,
-    "tag": "a",
-    "text": "🎥 Visual Perfection: 4K HDR 60FPS | Dolby Vision 8K/4K Showcase 18 minutes",
-    "type": "button",
-    "bbox": {
-      "x": 1183,
-      "y": 826,
-      "w": 226,
-      "h": 40
-    },
-    "html_id": "",
-    "html_classes": "yt-lockup-metadata-view-model__title"
-  },
-  {
-    "id": 51,
+    "id": 2,
     "tag": "input",
-    "text": "Search",
-    "type": "text",
+    "text": "Any",
+    "type": "radio",
     "bbox": {
-      "x": 411,
-      "y": 16,
-      "w": 491,
-      "h": 24
+      "x": 319,
+      "y": 50,
+      "w": 13,
+      "h": 13
     },
     "html_id": "",
-    "html_classes": "ytSearchboxComponentInput yt-searchbox-input title"
+    "html_classes": ""
   },
   {
-    "id": 52,
+    "id": 3,
+    "tag": "input",
+    "text": "Java",
+    "type": "radio",
+    "bbox": {
+      "x": 319,
+      "y": 84,
+      "w": 13,
+      "h": 13
+    },
+    "html_id": "",
+    "html_classes": ""
+  },
+  {
+    "id": 4,
+    "tag": "input",
+    "text": "Python",
+    "type": "radio",
+    "bbox": {
+      "x": 319,
+      "y": 118,
+      "w": 13,
+      "h": 13
+    },
+    "html_id": "",
+    "html_classes": ""
+  },
+  {
+    "id": 5,
+    "tag": "input",
+    "text": "Beginner",
+    "type": "checkbox",
+    "bbox": {
+      "x": 597,
+      "y": 50,
+      "w": 13,
+      "h": 13
+    },
+    "html_id": "",
+    "html_classes": ""
+  },
+  {
+    "id": 6,
+    "tag": "input",
+    "text": "Intermediate",
+    "type": "checkbox",
+    "bbox": {
+      "x": 597,
+      "y": 84,
+      "w": 13,
+      "h": 13
+    },
+    "html_id": "",
+    "html_classes": ""
+  },
+  {
+    "id": 7,
+    "tag": "input",
+    "text": "Advanced",
+    "type": "checkbox",
+    "bbox": {
+      "x": 597,
+      "y": 118,
+      "w": 13,
+      "h": 13
+    },
+    "html_id": "",
+    "html_classes": ""
+  },
+  {
+    "id": 8,
+    "tag": "select",
+    "text": "ID Course Name Language Level Enrollments",
+    "type": "button",
+    "bbox": {
+      "x": 378,
+      "y": 217,
+      "w": 220,
+      "h": 38
+    },
+    "html_id": "sortBy",
+    "html_classes": ""
+  },
+  {
+    "id": 9,
     "tag": "div",
-    "text": "0 Minutes 43 Seconds of 12 Minutes 31 Seconds",
+    "text": "5,000+",
     "type": "button",
     "bbox": {
-      "x": 256,
-      "y": 568,
-      "w": 75,
-      "h": 40
+      "x": 874,
+      "y": 37,
+      "w": 232,
+      "h": 46
     },
     "html_id": "",
-    "html_classes": "ytp-time-contents"
+    "html_classes": "dropdown-button"
   },
   {
-    "id": 53,
+    "id": 10,
     "tag": "div",
-    "text": "VALORANT",
+    "text": "Minimum enrollments",
     "type": "button",
     "bbox": {
-      "x": 1024,
-      "y": 248,
-      "w": 36,
-      "h": 36
+      "x": 874,
+      "y": 37,
+      "w": 232,
+      "h": 46
     },
-    "html_id": "",
-    "html_classes": "yt-spec-avatar-shape yt-spec-avatar-shape__button yt-spec-avatar-shape__button--button-medium yt-spec-avatar-shape__button--tappable"
+    "html_id": "enrollDropdown",
+    "html_classes": "dropdown"
   },
   {
-    "id": 54,
-    "tag": "div",
-    "text": "YouTube Video Player",
+    "id": 11,
+    "tag": "li",
+    "text": "Open page",
     "type": "button",
     "bbox": {
-      "x": 16,
-      "y": 68,
-      "w": 975,
-      "h": 548
-    },
-    "html_id": "movie_player",
-    "html_classes": "html5-video-player ytp-transparent ytp-exp-bottom-control-flexbox ytp-modern-caption ytp-exp-ppp-update ytp-livebadge-color ytp-grid-scrollable ytp-cards-teaser-dismissible ytp-disable-bottom-gradient ytp-delhi-modern ytp-delhi-modern-icons ytp-delhi-horizontal-volume-controls ytp-delhi-modern-compact-controls ytp-large-width-mode ytp-fine-scrubbing-exp ad-created ytp-fit-cover-video ytp-hide-fullscreen-title ytp-fullscreen-metadata-top ytp-hide-info-bar ytp-autonav-endscreen-cancelled-state ytp-autohide"
-  },
-  {
-    "id": 55,
-    "tag": "video",
-    "text": "",
-    "type": "button",
-    "bbox": {
-      "x": 16,
-      "y": 68,
-      "w": 975,
-      "h": 548
+      "x": 331,
+      "y": 560,
+      "w": 762,
+      "h": 28
     },
     "html_id": "",
-    "html_classes": "video-stream html5-main-video"
+    "html_classes": ""
   },
   {
-    "id": 56,
-    "tag": "div",
-    "text": "Seek slider",
+    "id": 12,
+    "tag": "li",
+    "text": "Select Language = Java",
     "type": "button",
     "bbox": {
-      "x": 28,
-      "y": 554,
-      "w": 951,
-      "h": 6
+      "x": 331,
+      "y": 588,
+      "w": 762,
+      "h": 28
     },
     "html_id": "",
-    "html_classes": "ytp-progress-bar"
+    "html_classes": ""
+  },
+  {
+    "id": 13,
+    "tag": "li",
+    "text": "Verify only Java courses are visible",
+    "type": "button",
+    "bbox": {
+      "x": 331,
+      "y": 616,
+      "w": 762,
+      "h": 28
+    },
+    "html_id": "",
+    "html_classes": ""
+  },
+  {
+    "id": 14,
+    "tag": "li",
+    "text": "Open page",
+    "type": "button",
+    "bbox": {
+      "x": 331,
+      "y": 808,
+      "w": 762,
+      "h": 28
+    },
+    "html_id": "",
+    "html_classes": ""
+  },
+  {
+    "id": 15,
+    "tag": "li",
+    "text": "Uncheck Intermediate and Advanced",
+    "type": "button",
+    "bbox": {
+      "x": 331,
+      "y": 836,
+      "w": 762,
+      "h": 28
+    },
+    "html_id": "",
+    "html_classes": ""
+  },
+  {
+    "id": 16,
+    "tag": "li",
+    "text": "Verify that only Beginner courses are visible",
+    "type": "button",
+    "bbox": {
+      "x": 331,
+      "y": 864,
+      "w": 762,
+      "h": 28
+    },
+    "html_id": "",
+    "html_classes": ""
+  },
+  {
+    "id": 17,
+    "tag": "label",
+    "text": "Any",
+    "type": "button",
+    "bbox": {
+      "x": 319,
+      "y": 43,
+      "w": 232,
+      "h": 28
+    },
+    "html_id": "",
+    "html_classes": ""
+  },
+  {
+    "id": 18,
+    "tag": "label",
+    "text": "Java",
+    "type": "button",
+    "bbox": {
+      "x": 319,
+      "y": 77,
+      "w": 232,
+      "h": 28
+    },
+    "html_id": "",
+    "html_classes": ""
+  },
+  {
+    "id": 19,
+    "tag": "label",
+    "text": "Python",
+    "type": "button",
+    "bbox": {
+      "x": 319,
+      "y": 111,
+      "w": 232,
+      "h": 28
+    },
+    "html_id": "",
+    "html_classes": ""
+  },
+  {
+    "id": 20,
+    "tag": "label",
+    "text": "Beginner",
+    "type": "button",
+    "bbox": {
+      "x": 597,
+      "y": 43,
+      "w": 232,
+      "h": 28
+    },
+    "html_id": "",
+    "html_classes": ""
+  },
+  {
+    "id": 21,
+    "tag": "label",
+    "text": "Intermediate",
+    "type": "button",
+    "bbox": {
+      "x": 597,
+      "y": 77,
+      "w": 232,
+      "h": 28
+    },
+    "html_id": "",
+    "html_classes": ""
+  },
+  {
+    "id": 22,
+    "tag": "label",
+    "text": "Advanced",
+    "type": "button",
+    "bbox": {
+      "x": 597,
+      "y": 111,
+      "w": 232,
+      "h": 28
+    },
+    "html_id": "",
+    "html_classes": ""
+  },
+  {
+    "id": 23,
+    "tag": "label",
+    "text": "Sort by:",
+    "type": "button",
+    "bbox": {
+      "x": 304,
+      "y": 222,
+      "w": 63,
+      "h": 28
+    },
+    "html_id": "",
+    "html_classes": ""
   }
 ]
