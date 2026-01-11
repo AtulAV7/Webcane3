@@ -49,6 +49,9 @@ class WebCane:
         # Track state
         self.is_first_task = True
         
+        # Voice interface for accessibility (set during execute_goal)
+        self.voice = None
+        
         # Build graph
         self.graph = self._build_graph()
         
@@ -101,6 +104,11 @@ class WebCane:
             
             if not self.browser.start_browser(headless=False):
                 return {"error": "Browser start failed"}
+            
+            # Voice feedback for navigation
+            if self.voice:
+                site_name = url.replace("https://", "").replace("http://", "").split("/")[0]
+                self.voice.speak(f"Navigating to {site_name}")
             
             print(f"[Browser] Navigating to: {url}")
             if not self.browser.navigate(url):
@@ -209,6 +217,19 @@ class WebCane:
             if not action:
                 print("[Execute] No action to execute")
                 return {"last_action_success": False}
+            
+            # Voice feedback for action (non-blocking)
+            action_type = action.get("action", "")
+            target = action.get("target", "")[:30]
+            if self.voice and action_type:
+                if action_type == "search":
+                    self.voice.speak(f"Searching for {action.get('query', target)}")
+                elif action_type == "click":
+                    self.voice.speak(f"Clicking {target}")
+                elif action_type == "type":
+                    self.voice.speak(f"Typing")
+                elif action_type == "navigate":
+                    self.voice.speak(f"Going to {target}")
             
             result = self.executor.execute_action(action)
             success = result.get("success", False)
@@ -326,7 +347,8 @@ class WebCane:
     def execute_goal(
         self,
         goal: str,
-        starting_url: str = None
+        starting_url: str = None,
+        voice = None
     ) -> Dict:
         """
         Execute a web automation goal using ReAct loop.
@@ -334,6 +356,7 @@ class WebCane:
         Args:
             goal: The goal to achieve
             starting_url: Optional URL (extracted from goal if not provided)
+            voice: VoiceInterface instance for accessibility (optional)
             
         Returns:
             Result dictionary with success, actions_taken, elapsed_time, error
@@ -344,6 +367,9 @@ class WebCane:
         print(f"Goal: {goal}")
         if starting_url:
             print(f"Starting URL: {starting_url}")
+        
+        # Set voice interface for accessibility feedback
+        self.voice = voice
         
         # Determine if this is first task or follow-up
         is_first_task = not self._is_browser_active()

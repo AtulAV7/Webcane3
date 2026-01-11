@@ -4,14 +4,16 @@ Handles API keys, model names, and system settings.
 """
 
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 
 
 class Config:
     """Centralized configuration for WebCane3."""
     
-    # Load environment variables
-    load_dotenv()
+    # Load environment variables from Webcane3/.env
+    _env_path = Path(__file__).parent / ".env"
+    load_dotenv(_env_path)
     
     # API Keys - Separate keys for different components to avoid quota issues
     GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
@@ -33,6 +35,11 @@ class Config:
     # Model Names - Groq
     GROQ_DOM_MODEL: str = "openai/gpt-oss-120b"                # DOM Text Agent
     GROQ_OBSERVER_MODEL: str = "meta-llama/llama-4-maverick-17b-128e-instruct"  # Observer
+    
+    # Voice Models (Groq) - Accessibility
+    GROQ_STT_MODEL: str = "whisper-large-v3-turbo"             # Speech-to-Text
+    GROQ_TTS_MODEL: str = "canopylabs/orpheus-v1-english"      # Text-to-Speech  
+    GROQ_TTS_VOICE: str = "autumn"                             # TTS Voice
     
     # Model Names - Ollama (Local Fallback)
     OLLAMA_MODEL: str = "llama3.2:3b"

@@ -1,338 +1,464 @@
 [
   {
     "id": 0,
-    "tag": "a",
-    "text": "View",
+    "tag": "button",
+    "text": "Log in",
     "type": "button",
     "bbox": {
-      "x": 1057,
-      "y": 354,
-      "w": 40,
-      "h": 22
+      "x": 1206,
+      "y": 16,
+      "w": 75,
+      "h": 48
     },
     "html_id": "",
-    "html_classes": ""
+    "html_classes": "G0yGFD ap8aAM Q3hcOU j0pMjI itmoZr GaMK1V O0u6sV"
   },
   {
     "id": 1,
-    "tag": "a",
-    "text": "View",
+    "tag": "button",
+    "text": "Sign up",
     "type": "button",
     "bbox": {
-      "x": 1057,
-      "y": 410,
-      "w": 40,
-      "h": 22
+      "x": 1290,
+      "y": 16,
+      "w": 87,
+      "h": 48
     },
     "html_id": "",
-    "html_classes": ""
+    "html_classes": "G0yGFD ap8aAM Q3hcOU gwpqhu itmoZr GaMK1V O0u6sV"
   },
   {
     "id": 2,
-    "tag": "input",
-    "text": "Any",
-    "type": "radio",
+    "tag": "button",
+    "text": "Setting",
+    "type": "button",
     "bbox": {
-      "x": 319,
-      "y": 50,
-      "w": 13,
-      "h": 13
+      "x": 1385,
+      "y": 28,
+      "w": 24,
+      "h": 24
     },
     "html_id": "",
-    "html_classes": ""
+    "html_classes": "euRXRl"
   },
   {
     "id": 3,
-    "tag": "input",
-    "text": "Java",
-    "type": "radio",
+    "tag": "button",
+    "text": "See more",
+    "type": "button",
     "bbox": {
-      "x": 319,
-      "y": 84,
-      "w": 13,
-      "h": 13
+      "x": 661,
+      "y": 518,
+      "w": 102,
+      "h": 48
     },
     "html_id": "",
-    "html_classes": ""
+    "html_classes": "G0yGFD ap8aAM Q3hcOU j0pMjI itmoZr GaMK1V O0u6sV"
   },
   {
     "id": 4,
-    "tag": "input",
-    "text": "Python",
-    "type": "radio",
+    "tag": "a",
+    "text": "Pinterest home",
+    "type": "button",
     "bbox": {
-      "x": 319,
-      "y": 118,
-      "w": 13,
-      "h": 13
+      "x": 16,
+      "y": 29,
+      "w": 122,
+      "h": 21
     },
     "html_id": "",
-    "html_classes": ""
+    "html_classes": "etmDmh i7jpet zlD4hU Q3hcOU g81vm9 O0u6sV hlFz_k itw4K9 g0I6wi be_g_n ap8aAM"
   },
   {
     "id": 5,
-    "tag": "input",
-    "text": "Beginner",
-    "type": "checkbox",
+    "tag": "a",
+    "text": "Explore",
+    "type": "button",
     "bbox": {
-      "x": 597,
-      "y": 50,
-      "w": 13,
-      "h": 13
+      "x": 138,
+      "y": 16,
+      "w": 89,
+      "h": 48
     },
     "html_id": "",
-    "html_classes": ""
+    "html_classes": "etmDmh i7jpet zlD4hU Q3hcOU g8WGSl O0u6sV KQwCbH itw4K9 g0I6wi be_g_n ap8aAM"
   },
   {
     "id": 6,
-    "tag": "input",
-    "text": "Intermediate",
-    "type": "checkbox",
+    "tag": "a",
+    "text": "New season spirit Micro rituals to calm you",
+    "type": "button",
     "bbox": {
-      "x": 597,
-      "y": 84,
-      "w": 13,
-      "h": 13
+      "x": 90,
+      "y": 196,
+      "w": 404,
+      "h": 306
     },
     "html_id": "",
-    "html_classes": ""
+    "html_classes": "etmDmh i7jpet zlD4hU Q3hcOU DodKMr O0u6sV KQwCbH itw4K9 g0I6wi be_g_n ap8aAM"
   },
   {
     "id": 7,
-    "tag": "input",
-    "text": "Advanced",
-    "type": "checkbox",
+    "tag": "a",
+    "text": "January eats Healthy recipe roundup",
+    "type": "button",
     "bbox": {
-      "x": 597,
-      "y": 118,
-      "w": 13,
-      "h": 13
+      "x": 510,
+      "y": 196,
+      "w": 404,
+      "h": 306
     },
     "html_id": "",
-    "html_classes": ""
+    "html_classes": "etmDmh i7jpet zlD4hU Q3hcOU DodKMr O0u6sV KQwCbH itw4K9 g0I6wi be_g_n ap8aAM"
   },
   {
     "id": 8,
-    "tag": "select",
-    "text": "ID Course Name Language Level Enrollments",
+    "tag": "a",
+    "text": "Next hobby? 10-minute drawing ideas",
     "type": "button",
     "bbox": {
-      "x": 378,
-      "y": 217,
-      "w": 220,
-      "h": 38
+      "x": 930,
+      "y": 196,
+      "w": 404,
+      "h": 306
     },
-    "html_id": "sortBy",
-    "html_classes": ""
+    "html_id": "",
+    "html_classes": "etmDmh i7jpet zlD4hU Q3hcOU DodKMr O0u6sV KQwCbH itw4K9 g0I6wi be_g_n ap8aAM"
   },
   {
     "id": 9,
-    "tag": "div",
-    "text": "5,000+",
+    "tag": "a",
+    "text": "Animals",
     "type": "button",
     "bbox": {
-      "x": 874,
-      "y": 37,
-      "w": 232,
-      "h": 46
+      "x": 90,
+      "y": 676,
+      "w": 236,
+      "h": 118
     },
     "html_id": "",
-    "html_classes": "dropdown-button"
+    "html_classes": "etmDmh i7jpet DodKMr KQwCbH Q3hcOU y1OnKm zlD4hU eTLu1g O0u6sV"
   },
   {
     "id": 10,
-    "tag": "div",
-    "text": "Minimum enrollments",
+    "tag": "a",
+    "text": "Art",
     "type": "button",
     "bbox": {
-      "x": 874,
-      "y": 37,
-      "w": 232,
-      "h": 46
+      "x": 342,
+      "y": 676,
+      "w": 236,
+      "h": 118
     },
-    "html_id": "enrollDropdown",
-    "html_classes": "dropdown"
+    "html_id": "",
+    "html_classes": "etmDmh i7jpet DodKMr KQwCbH Q3hcOU y1OnKm zlD4hU eTLu1g O0u6sV"
   },
   {
     "id": 11,
-    "tag": "li",
-    "text": "Open page",
+    "tag": "a",
+    "text": "Beauty",
     "type": "button",
     "bbox": {
-      "x": 331,
-      "y": 560,
-      "w": 762,
-      "h": 28
+      "x": 594,
+      "y": 676,
+      "w": 236,
+      "h": 118
     },
     "html_id": "",
-    "html_classes": ""
+    "html_classes": "etmDmh i7jpet DodKMr KQwCbH Q3hcOU y1OnKm zlD4hU eTLu1g O0u6sV"
   },
   {
     "id": 12,
-    "tag": "li",
-    "text": "Select Language = Java",
+    "tag": "a",
+    "text": "Design",
     "type": "button",
     "bbox": {
-      "x": 331,
-      "y": 588,
-      "w": 762,
-      "h": 28
+      "x": 846,
+      "y": 676,
+      "w": 236,
+      "h": 118
     },
     "html_id": "",
-    "html_classes": ""
+    "html_classes": "etmDmh i7jpet DodKMr KQwCbH Q3hcOU y1OnKm zlD4hU eTLu1g O0u6sV"
   },
   {
     "id": 13,
-    "tag": "li",
-    "text": "Verify only Java courses are visible",
+    "tag": "a",
+    "text": "DIY And Crafts",
     "type": "button",
     "bbox": {
-      "x": 331,
-      "y": 616,
-      "w": 762,
-      "h": 28
+      "x": 1098,
+      "y": 676,
+      "w": 236,
+      "h": 118
     },
     "html_id": "",
-    "html_classes": ""
+    "html_classes": "etmDmh i7jpet DodKMr KQwCbH Q3hcOU y1OnKm zlD4hU eTLu1g O0u6sV"
   },
   {
     "id": 14,
-    "tag": "li",
-    "text": "Open page",
+    "tag": "a",
+    "text": "Food And Drink",
     "type": "button",
     "bbox": {
-      "x": 331,
-      "y": 808,
-      "w": 762,
-      "h": 28
+      "x": 90,
+      "y": 810,
+      "w": 236,
+      "h": 118
     },
     "html_id": "",
-    "html_classes": ""
+    "html_classes": "etmDmh i7jpet DodKMr KQwCbH Q3hcOU y1OnKm zlD4hU eTLu1g O0u6sV"
   },
   {
     "id": 15,
-    "tag": "li",
-    "text": "Uncheck Intermediate and Advanced",
+    "tag": "a",
+    "text": "Home Decor",
     "type": "button",
     "bbox": {
-      "x": 331,
-      "y": 836,
-      "w": 762,
-      "h": 28
+      "x": 342,
+      "y": 810,
+      "w": 236,
+      "h": 118
     },
     "html_id": "",
-    "html_classes": ""
+    "html_classes": "etmDmh i7jpet DodKMr KQwCbH Q3hcOU y1OnKm zlD4hU eTLu1g O0u6sV"
   },
   {
     "id": 16,
-    "tag": "li",
-    "text": "Verify that only Beginner courses are visible",
+    "tag": "a",
+    "text": "Men's Fashion",
     "type": "button",
     "bbox": {
-      "x": 331,
-      "y": 864,
-      "w": 762,
-      "h": 28
+      "x": 594,
+      "y": 810,
+      "w": 236,
+      "h": 118
     },
     "html_id": "",
-    "html_classes": ""
+    "html_classes": "etmDmh i7jpet DodKMr KQwCbH Q3hcOU y1OnKm zlD4hU eTLu1g O0u6sV"
   },
   {
     "id": 17,
-    "tag": "label",
-    "text": "Any",
+    "tag": "a",
+    "text": "Quotes",
     "type": "button",
     "bbox": {
-      "x": 319,
-      "y": 43,
-      "w": 232,
-      "h": 28
+      "x": 846,
+      "y": 810,
+      "w": 236,
+      "h": 118
     },
     "html_id": "",
-    "html_classes": ""
+    "html_classes": "etmDmh i7jpet DodKMr KQwCbH Q3hcOU y1OnKm zlD4hU eTLu1g O0u6sV"
   },
   {
     "id": 18,
-    "tag": "label",
-    "text": "Java",
+    "tag": "a",
+    "text": "Tattoos",
     "type": "button",
     "bbox": {
-      "x": 319,
-      "y": 77,
-      "w": 232,
-      "h": 28
+      "x": 1098,
+      "y": 810,
+      "w": 236,
+      "h": 118
     },
     "html_id": "",
-    "html_classes": ""
+    "html_classes": "etmDmh i7jpet DodKMr KQwCbH Q3hcOU y1OnKm zlD4hU eTLu1g O0u6sV"
   },
   {
     "id": 19,
-    "tag": "label",
-    "text": "Python",
-    "type": "button",
+    "tag": "input",
+    "text": "Search",
+    "type": "text",
     "bbox": {
-      "x": 319,
-      "y": 111,
-      "w": 232,
-      "h": 28
+      "x": 283,
+      "y": 16,
+      "w": 899,
+      "h": 48
     },
     "html_id": "",
     "html_classes": ""
   },
   {
     "id": 20,
-    "tag": "label",
-    "text": "Beginner",
+    "tag": "div",
+    "text": "New season spirit Micro rituals to calm you",
     "type": "button",
     "bbox": {
-      "x": 597,
-      "y": 43,
-      "w": 232,
-      "h": 28
+      "x": 90,
+      "y": 196,
+      "w": 404,
+      "h": 306
     },
     "html_id": "",
-    "html_classes": ""
+    "html_classes": "V3gVHw TfR6nu v65fHc"
   },
   {
     "id": 21,
-    "tag": "label",
-    "text": "Intermediate",
+    "tag": "div",
+    "text": "January eats Healthy recipe roundup",
     "type": "button",
     "bbox": {
-      "x": 597,
-      "y": 77,
-      "w": 232,
-      "h": 28
+      "x": 510,
+      "y": 196,
+      "w": 404,
+      "h": 306
     },
     "html_id": "",
-    "html_classes": ""
+    "html_classes": "V3gVHw TfR6nu v65fHc"
   },
   {
     "id": 22,
-    "tag": "label",
-    "text": "Advanced",
+    "tag": "div",
+    "text": "Next hobby? 10-minute drawing ideas",
     "type": "button",
     "bbox": {
-      "x": 597,
-      "y": 111,
-      "w": 232,
-      "h": 28
+      "x": 930,
+      "y": 196,
+      "w": 404,
+      "h": 306
     },
     "html_id": "",
-    "html_classes": ""
+    "html_classes": "V3gVHw TfR6nu v65fHc"
   },
   {
     "id": 23,
-    "tag": "label",
-    "text": "Sort by:",
+    "tag": "div",
+    "text": "Animals",
     "type": "button",
     "bbox": {
-      "x": 304,
-      "y": 222,
-      "w": 63,
-      "h": 28
+      "x": 90,
+      "y": 676,
+      "w": 236,
+      "h": 118
     },
     "html_id": "",
-    "html_classes": ""
+    "html_classes": "V3gVHw TfR6nu v65fHc"
+  },
+  {
+    "id": 24,
+    "tag": "div",
+    "text": "Art",
+    "type": "button",
+    "bbox": {
+      "x": 342,
+      "y": 676,
+      "w": 236,
+      "h": 118
+    },
+    "html_id": "",
+    "html_classes": "V3gVHw TfR6nu v65fHc"
+  },
+  {
+    "id": 25,
+    "tag": "div",
+    "text": "Beauty",
+    "type": "button",
+    "bbox": {
+      "x": 594,
+      "y": 676,
+      "w": 236,
+      "h": 118
+    },
+    "html_id": "",
+    "html_classes": "V3gVHw TfR6nu v65fHc"
+  },
+  {
+    "id": 26,
+    "tag": "div",
+    "text": "Design",
+    "type": "button",
+    "bbox": {
+      "x": 846,
+      "y": 676,
+      "w": 236,
+      "h": 118
+    },
+    "html_id": "",
+    "html_classes": "V3gVHw TfR6nu v65fHc"
+  },
+  {
+    "id": 27,
+    "tag": "div",
+    "text": "DIY And Crafts",
+    "type": "button",
+    "bbox": {
+      "x": 1098,
+      "y": 676,
+      "w": 236,
+      "h": 118
+    },
+    "html_id": "",
+    "html_classes": "V3gVHw TfR6nu v65fHc"
+  },
+  {
+    "id": 28,
+    "tag": "div",
+    "text": "Food And Drink",
+    "type": "button",
+    "bbox": {
+      "x": 90,
+      "y": 810,
+      "w": 236,
+      "h": 118
+    },
+    "html_id": "",
+    "html_classes": "V3gVHw TfR6nu v65fHc"
+  },
+  {
+    "id": 29,
+    "tag": "div",
+    "text": "Home Decor",
+    "type": "button",
+    "bbox": {
+      "x": 342,
+      "y": 810,
+      "w": 236,
+      "h": 118
+    },
+    "html_id": "",
+    "html_classes": "V3gVHw TfR6nu v65fHc"
+  },
+  {
+    "id": 30,
+    "tag": "div",
+    "text": "Men's Fashion",
+    "type": "button",
+    "bbox": {
+      "x": 594,
+      "y": 810,
+      "w": 236,
+      "h": 118
+    },
+    "html_id": "",
+    "html_classes": "V3gVHw TfR6nu v65fHc"
+  },
+  {
+    "id": 31,
+    "tag": "div",
+    "text": "Quotes",
+    "type": "button",
+    "bbox": {
+      "x": 846,
+      "y": 810,
+      "w": 236,
+      "h": 118
+    },
+    "html_id": "",
+    "html_classes": "V3gVHw TfR6nu v65fHc"
+  },
+  {
+    "id": 32,
+    "tag": "div",
+    "text": "Tattoos",
+    "type": "button",
+    "bbox": {
+      "x": 1098,
+      "y": 810,
+      "w": 236,
+      "h": 118
+    },
+    "html_id": "",
+    "html_classes": "V3gVHw TfR6nu v65fHc"
   }
 ]
