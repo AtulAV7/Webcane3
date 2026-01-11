@@ -224,6 +224,10 @@ class WebCane:
                 "timestamp": time.time() - state.get("start_time", time.time())
             }
             
+            # Add Vision reasoning if available (helps Supervisor verify visual tasks)
+            if result.get('vision_reasoning'):
+                history_entry["vision_confirmed"] = result['vision_reasoning'][:100]
+            
             # Wait for page to settle
             time.sleep(Config.STEP_DELAY)
             

@@ -128,7 +128,12 @@ class BrowserController:
                 let id = 0;
                 const selectors = [
                     'button', 'a', 'input', 'textarea', 'select',
-                    '[role="button"]', '[role="link"]', '[onclick]', '[tabindex]'
+                    '[role="button"]', '[role="link"]', '[onclick]', '[tabindex]',
+                    // Dropdown and list-related selectors
+                    'option', 'li', '[role="option"]', '[role="listbox"]', '[role="menu"]',
+                    '[role="menuitem"]', '[role="listitem"]', '[role="combobox"]',
+                    // Additional clickable elements
+                    'label', '[data-value]', '[data-option]'
                 ];
                 
                 const allElements = new Set();

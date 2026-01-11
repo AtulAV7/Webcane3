@@ -87,6 +87,9 @@ class Executor:
         
         # Track last action for typing safety
         self.last_action_was_click = False
+        
+        # Store Vision agent's reasoning for verification (passed to Supervisor)
+        self.last_vision_reasoning = None
     
     def execute_action(self, action: Dict) -> Dict:
         """
@@ -451,7 +454,8 @@ class Executor:
                             'success': True,
                             'method': 'vision',
                             'element_id': element_id,
-                            'scroll_attempts': scroll_attempt
+                            'scroll_attempts': scroll_attempt,
+                            'vision_reasoning': self.last_vision_reasoning  # What Vision saw
                         }
                 print("[Executor] Vision failed, trying DOM fallback...")
             
@@ -482,7 +486,8 @@ class Executor:
                             'success': True,
                             'method': 'vision',
                             'element_id': element_id,
-                            'scroll_attempts': scroll_attempt
+                            'scroll_attempts': scroll_attempt,
+                            'vision_reasoning': self.last_vision_reasoning  # What Vision saw
                         }
         
         self.stats['failures'] += 1
@@ -662,6 +667,9 @@ If no element matches, write: ANSWER: -1"""
             print("-" * 50)
             print(result[:300] if len(result) > 300 else result)
             print("-" * 50)
+            
+            # Store reasoning for verification (passed to Supervisor)
+            self.last_vision_reasoning = result[:200]  # Store first 200 chars
             
             # Extract answer
             answer_match = re.search(r'ANSWER:\s*(-?\d+)', result, re.IGNORECASE)

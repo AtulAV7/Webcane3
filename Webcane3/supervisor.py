@@ -170,6 +170,17 @@ DECISION RULES:
 4. If stuck after 3+ failed attempts, try alternative or FAILED
 5. Be specific with target descriptions
 
+CRITICAL - NAVIGATION GUARDS:
+- NEVER navigate to a random/different URL unless the goal explicitly says to
+- If you're already on a page with the needed elements, STAY on that page
+- If actions are succeeding, CONTINUE on the current page
+- Only use "navigate" if you're on the wrong site OR goal says "go to..."
+
+CONTINUE MODE:
+- If goal starts with "Now..." or implies continuing, you're on the right page
+- Focus on completing remaining steps, don't navigate away
+- Check RECENT ACTIONS to see what's already done - don't repeat!
+
 Output ONLY a valid JSON object. No explanation."""
 
             time.sleep(Config.API_DELAY)
@@ -252,7 +263,13 @@ Output ONLY a valid JSON object. No explanation."""
             action = entry.get('action', 'unknown')
             target = entry.get('target', '')[:30]
             success = "SUCCESS" if entry.get('success') else "FAILED"
-            lines.append(f"- {action} '{target}' -> {success}")
+            
+            # Include Vision confirmation if available (proves what was clicked)
+            vision_info = ""
+            if entry.get('vision_confirmed'):
+                vision_info = f" [Vision confirmed: {entry['vision_confirmed'][:50]}...]"
+            
+            lines.append(f"- {action} '{target}' -> {success}{vision_info}")
         
         return "\n".join(lines)
     
