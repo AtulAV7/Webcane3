@@ -163,7 +163,7 @@ Provide a DETAILED JSON response with these fields:
    Empty array if none visible.
 
 3. "previous_action_result": If there was a previous action, analyze if it worked:
-   - "SUCCESS - [detailed evidence]" (e.g., "SUCCESS - search results now visible for 'phones', URL changed to /search")
+   - "SUCCESS - only do if expected action is there for cases like typing something into a textbox[detailed evidence]" (e.g., "SUCCESS - search results now visible for 'phones', URL changed to /search")
    - "FAILED - [detailed reason]" (e.g., "FAILED - still on login page, error message 'Invalid password' visible")
    - "PARTIAL - [explanation]"
    - "N/A" if no previous action
@@ -172,22 +172,34 @@ Provide a DETAILED JSON response with these fields:
    - Be specific with descriptions and STATES (e.g., "Submit button [Disabled]", "Type checkbox [Checked]")
    - Include position hints
    - For lists/grids: mention items by name and position
+   - Don't be hallucinated and output an empty textbox with 'text' as the value just seeing the goal demands.
    - Example: ["Search bar (empty) at top", "Submit button (enabled) bottom right", "'Terms' checkbox (unchecked)", "Category dropdown (selected: 'All')"]
 
-5. "goal_progress": Brief assessment of how close we are to completing the goal:
+5. "goal_blockers": Any visible text/messages that would PREVENT achieving the goal:
+   - "Product currently unavailable" or "Out of stock" (blocks add-to-cart goals)
+   - "Login required" or "Please sign in" (blocks actions requiring authentication)
+   - "Item no longer exists" or "Page not found"
+   - "Maximum quantity reached" or "Already in cart"
+   - ANY status message, warning, or notice that indicates the goal CANNOT be achieved
+   - This is DIFFERENT from UI blockers (popups) - these are informational messages
+   - Return empty array if no such messages visible
+
+6. "goal_progress": Brief assessment of how close we are to completing the goal:
    - "NOT_STARTED"
    - "IN_PROGRESS"
    - "ALMOST_DONE"
    - "COMPLETE"
-   - "BLOCKED"
+   - "BLOCKED" (use this if goal_blockers has items)
+   - "IMPOSSIBLE" (use if goal cannot be achieved based on visible information)
 
 Example response:
 {{
-    "page_state": "YouTube homepage showing video recommendations grid with trending content. Navigation bar at top with logo, search bar, and user menu. Left sidebar has Home, Shorts, Subscriptions links. Main area shows 4x4 grid of video thumbnails.",
+    "page_state": "Amazon product page for Samsung Galaxy. Shows product title, price Rs 74,999, and 'Currently unavailable' notice. No Add to Cart button visible.",
     "blockers": [],
-    "previous_action_result": "SUCCESS - Successfully navigated to YouTube homepage from blank page",
-    "key_elements": ["Search bar at top center", "First video: 'Top 10 Nature Documentaries'", "Shorts button in left sidebar", "Home button in left sidebar", "Trending section below fold"],
-    "goal_progress": "IN_PROGRESS"
+    "goal_blockers": ["Currently unavailable - We don't know when or if this item will be back in stock"],
+    "previous_action_result": "SUCCESS - Navigated to product page",
+    "key_elements": ["Product title", "Price display", "Unavailable notice", "Similar products section"],
+    "goal_progress": "IMPOSSIBLE"
 }}
 
 Respond with ONLY the JSON object, no other text."""

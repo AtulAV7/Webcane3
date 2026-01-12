@@ -365,11 +365,22 @@ class Executor:
                 self.browser.scroll('down', 600)
                 time.sleep(1.5)
         
+        # After all scroll attempts failed, scroll back to top
+        print(f"[Executor] Element not found after scrolling down. Scrolling back to top...")
+        try:
+            self.browser.page.keyboard.press("Home")  # Scroll to top
+            time.sleep(1)
+        except:
+            # Fallback: scroll up multiple times
+            for _ in range(max_scrolls):
+                self.browser.scroll('up', 600)
+                time.sleep(0.5)
+        
         self.stats['failures'] += 1
         return {
             'success': False,
             'method': 'scroll_find_macro',
-            'error': f'Element not found after {max_scrolls} scroll attempts: {target}'
+            'error': f'Element not found after {max_scrolls} scroll attempts (scrolled back to top): {target}'
         }
     
     def _execute_dismiss(self, target: str) -> Dict:
@@ -425,24 +436,66 @@ class Executor:
     
     # ==================== STANDARD ACTIONS ====================
     
-    def _try_focus_input(self) -> bool:
-        """Try to focus an input element before typing."""
+    def _try_focus_input(self, target_hint: str = "") -> bool:
+        """
+        Try to focus an input element before typing.
+        
+        Args:
+            target_hint: Optional hint for what input to find (e.g., label text nearby)
+        
+        Returns:
+            True if an input was focused, False otherwise
+        """
         try:
             elements = self.browser.extract_elements()
-            input_keywords = ['search', 'input', 'query', 'text']
             
+            # Priority 1: Find input/textarea elements
+            input_elements = []
             for el in elements:
-                tag = el.get('tag', '').lower()
-                text = (el.get('text', '') or '').lower()
-                
+                tag = (el.get('tag') or '').lower()
                 if tag in ['input', 'textarea']:
-                    if any(kw in text for kw in input_keywords) or el.get('type') in ['text', 'search']:
+                    el_type = (el.get('type') or 'text').lower()
+                    # Skip non-text inputs
+                    if el_type not in ['text', 'search', 'password', 'email', 'tel', 'url', 'number', '']:
+                        continue
+                    input_elements.append(el)
+            
+            if not input_elements:
+                print("[Executor] No input elements found on page!")
+                return False
+            
+            # If there's a target hint, try to find matching input
+            if target_hint:
+                hint_lower = target_hint.lower()
+                for el in input_elements:
+                    text = (el.get('text') or '').lower()
+                    placeholder = (el.get('placeholder') or '').lower()
+                    html_id = (el.get('html_id') or '').lower()
+                    if hint_lower in text or hint_lower in placeholder or hint_lower in html_id:
                         if self.browser.click_element(el['id'], elements):
-                            print(f"[Executor] Auto-focused input element {el['id']}")
-                            time.sleep(0.5)
+                            print(f"[Executor] Focused input {el['id']} (matched hint: {target_hint})")
+                            time.sleep(0.3)
                             return True
+            
+            # Fallback: Click the first visible input element
+            for el in input_elements:
+                if self.browser.click_element(el['id'], elements):
+                    print(f"[Executor] Focused first available input {el['id']}")
+                    time.sleep(0.3)
+                    return True
+            
+            # Last resort: Try using Tab to find next input
+            try:
+                self.browser.page.keyboard.press("Tab")
+                time.sleep(0.2)
+                print("[Executor] Used Tab to focus next input")
+                return True
+            except:
+                pass
+                
             return False
-        except:
+        except Exception as e:
+            print(f"[Executor] Focus input error: {e}")
             return False
     
     def _soft_validate_element(self, element: Dict, target: str) -> bool:
@@ -749,18 +802,38 @@ ID:"""
                 "Content-Type": "application/json"
             }
             
-            nvidia_prompt = f"""Look at this screenshot with numbered red boxes around interactive elements.
+            nvidia_prompt = f"""You are a precise visual element locator. Look at this screenshot with numbered red boxes around interactive elements.
 
 TASK: Find the element that best matches: "{target}"
 
-INSTRUCTIONS:
-1. Look at the VISUAL content inside each numbered red box
-2. Find the box that visually matches what is described
-3. For thumbnails/images - look at what the image shows
-4. For buttons/links - read the text inside the box
-5. Prefer elements in the main content area (center/below header)
+STEP-BY-STEP REASONING (you MUST follow these steps):
 
-Provide brief reasoning (1-2 sentences), then write: ANSWER: [number]
+STEP 1 - UNDERSTAND THE TARGET:
+What am I looking for? Describe in detail what "{target}" means visually.
+- If it's a thumbnail: What should the image show?
+- If it's a button: What text should it contain?
+- If it's a product: What name/price should be visible?
+
+STEP 2 - SCAN ALL NUMBERED BOXES:
+Go through each numbered red box systematically (red number is always left top of box):
+- Box 0: What is inside? Does it match?
+- Box 1: What is inside? Does it match?
+- Continue for all visible boxes...
+- List the top 2-3 candidates that could match.
+
+STEP 3 - COMPARE CANDIDATES:
+For each candidate from Step 2:
+- How well does it match the target description?
+- Is it in the expected location (main content, not header/sidebar)?
+- Could there be a better match?
+
+STEP 4 - FINAL DECISION:
+Choose the BEST matching box number. If none match well, output -1.
+
+OUTPUT FORMAT:
+After your reasoning, write on a new line: ANSWER: [number]
+Example: ANSWER: 5
+
 If no element matches, write: ANSWER: -1"""
             
             payload = {
@@ -774,8 +847,8 @@ If no element matches, write: ANSWER: -1"""
                         ]
                     }
                 ],
-                "max_tokens": 500,
-                "temperature": 0.15,
+                "max_tokens": 1000,
+                "temperature": 0.1,
                 "stream": False
             }
             

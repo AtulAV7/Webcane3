@@ -179,11 +179,17 @@ AVAILABLE ACTIONS:
 3. click - Click an element by description. Example: {{"action": "click", "target": "first product result"}}
 4. type - Type text into already-focused field. Example: {{"action": "type", "target": "samsung phones"}}
 5. scroll_find - Scroll to find a visual element. Example: {{"action": "scroll_find", "target": "video with nature thumbnail"}}
-6. scroll - Simple scroll. Example: {{"action": "scroll", "target": "down"}}
-7. press_key - Press a key. Example: {{"action": "press_key", "target": "Enter"}}
+6. scroll - Simple scroll (up or down). Example: {{"action": "scroll", "target": "down"}} or {{"action": "scroll", "target": "up"}}
+7. press_key - Press a key. Example: {{"action": "press_key", "target": "Enter"}} or {{"action": "press_key", "target": "Home"}} (scroll to top)
 8. dismiss - Dismiss popup/modal. Example: {{"action": "dismiss", "target": "close button"}}
 9. COMPLETE - Goal is FULLY achieved. Use this ONLY when the goal is done.
-10. FAILED - Cannot proceed. Example: {{"action": "FAILED", "reason": "Login required"}}
+10. FAILED - Cannot proceed. Example: {{"action": "FAILED", "reason": "Product is unavailable"}}
+
+IMPORTANT - HANDLING GOAL BLOCKERS:
+- Check the observation for "goal_blockers" - these are messages that make the goal IMPOSSIBLE
+- Examples: "Product currently unavailable", "Out of stock", "Login required", "Page not found"
+- If goal_blockers exist, output FAILED with the reason, don't keep scrolling!
+- Example: {{"action": "FAILED", "reason": "Product is currently unavailable - cannot add to cart"}}
 
 CRITICAL RULES FOR GOAL COMPLETION:
 - ONLY do what the user asked for, nothing more!
@@ -217,6 +223,7 @@ CRITICAL - SEARCH COMPLETION VERIFICATION:
 - If URL is still the homepage (e.g., "google.com" without "/search"), search has NOT happened - keep trying!
 - Example: URL "google.com/?zx=..." means still on homepage = NOT COMPLETE
 - Example: URL "google.com/search?q=cats" means search results = CAN BE COMPLETE
+- Similarly try to do URL verifications for goals or actions that supposed to have a url change.
 
 CONTINUE MODE:
 - If goal starts with "Now..." or implies continuing, you're on the right page
