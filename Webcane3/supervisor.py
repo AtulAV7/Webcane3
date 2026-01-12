@@ -19,6 +19,14 @@ except ImportError:
     LANGCHAIN_NVIDIA_AVAILABLE = False
     print("[Supervisor] langchain-nvidia-ai-endpoints not installed. Run: pip install langchain-nvidia-ai-endpoints")
 
+# Groq imports (for GPT-OSS)
+try:
+    from groq import Groq
+    GROQ_AVAILABLE = True
+except ImportError:
+    GROQ_AVAILABLE = False
+    print("[Supervisor] groq sdk not installed. Run: pip install groq")
+
 
 class Supervisor:
     """
@@ -47,34 +55,62 @@ class Supervisor:
         "FAILED"        # Cannot complete goal
     ]
     
-    def __init__(self):
-        """Initialize the Supervisor with LangChain NVIDIA client."""
-        self.model_name = Config.NVIDIA_SUPERVISOR_MODEL
-        self.api_key = Config.NVIDIA_API_KEY2
+    
+    def __init__(self, supervisor_model: str = "deepseek"):
+        """
+        Initialize Supervisor.
+        
+        Args:
+            supervisor_model: 'deepseek' (NVIDIA) or 'gpt-oss' (Groq)
+        """
+        self.provider = supervisor_model
         self.client = None
         self.available = False
         
-        if not LANGCHAIN_NVIDIA_AVAILABLE:
-            print("[Supervisor] LangChain NVIDIA SDK not available")
-            return
-        
-        if not self.api_key:
-            print("[Supervisor] NVIDIA_API_KEY2 not configured")
-            return
-        
-        try:
-            self.client = ChatNVIDIA(
-                model=self.model_name,
-                api_key=self.api_key,
-                temperature=0.2,
-                top_p=0.7,
-                max_tokens=4096,  # Increased for thinking mode - needs room for both reasoning + JSON output
-                model_kwargs={"chat_template_kwargs": {"thinking": True}}
-            )
-            self.available = True
-            print(f"[Supervisor] Ready ({self.model_name}) with thinking enabled")
-        except Exception as e:
-            print(f"[Supervisor] Setup failed: {e}")
+        if self.provider == "gpt-oss":
+            # Groq / OpenAI GPT-OSS-120b
+            self.model_name = Config.GROQ_SUPERVISOR_MODEL
+            self.api_key = Config.GROQ_API_KEY2
+            
+            if not GROQ_AVAILABLE:
+                print("[Supervisor] Groq SDK not available")
+                return
+            if not self.api_key:
+                print("[Supervisor] GROQ_API_KEY2 not configured (required for GPT-OSS)")
+                return
+                
+            try:
+                self.client = Groq(api_key=self.api_key)
+                self.available = True
+                print(f"[Supervisor] Ready ({self.model_name}) via Groq")
+            except Exception as e:
+                print(f"[Supervisor] Groq setup failed: {e}")
+                
+        else:
+            # Default: NVIDIA DeepSeek
+            self.model_name = Config.NVIDIA_SUPERVISOR_MODEL
+            self.api_key = Config.NVIDIA_API_KEY2
+            
+            if not LANGCHAIN_NVIDIA_AVAILABLE:
+                print("[Supervisor] LangChain NVIDIA SDK not available")
+                return
+            if not self.api_key:
+                print("[Supervisor] NVIDIA_API_KEY2 not configured")
+                return
+            
+            try:
+                self.client = ChatNVIDIA(
+                    model=self.model_name,
+                    api_key=self.api_key,
+                    temperature=0.2,
+                    top_p=0.7,
+                    max_tokens=4096,
+                    model_kwargs={"chat_template_kwargs": {"thinking": True}}
+                )
+                self.available = True
+                print(f"[Supervisor] Ready ({self.model_name}) with thinking enabled")
+            except Exception as e:
+                print(f"[Supervisor] NVIDIA setup failed: {e}")
     
     def decide_next_action(
         self,
@@ -176,6 +212,12 @@ CRITICAL - NAVIGATION GUARDS:
 - If actions are succeeding, CONTINUE on the current page
 - Only use "navigate" if you're on the wrong site OR goal says "go to..."
 
+CRITICAL - SEARCH COMPLETION VERIFICATION:
+- For search goals: ONLY declare COMPLETE if the URL contains "/search" or "q=" or similar search parameters
+- If URL is still the homepage (e.g., "google.com" without "/search"), search has NOT happened - keep trying!
+- Example: URL "google.com/?zx=..." means still on homepage = NOT COMPLETE
+- Example: URL "google.com/search?q=cats" means search results = CAN BE COMPLETE
+
 CONTINUE MODE:
 - If goal starts with "Now..." or implies continuing, you're on the right page
 - Focus on completing remaining steps, don't navigate away
@@ -191,14 +233,45 @@ Output ONLY a valid JSON object. No explanation."""
             reasoning_content = ""
             response_content = ""
             
-            for chunk in self.client.stream([{"role": "user", "content": prompt}]):
-                # Get reasoning content if available
-                if chunk.additional_kwargs and "reasoning_content" in chunk.additional_kwargs:
-                    reasoning_content += chunk.additional_kwargs["reasoning_content"]
-                
-                # Get main content
-                if chunk.content:
-                    response_content += chunk.content
+            if self.provider == "gpt-oss":
+                # Groq specific completion loop
+                try:
+                    completion = self.client.chat.completions.create(
+                        model=self.model_name,
+                        messages=[
+                          {
+                            "role": "user",
+                            "content": prompt
+                          }
+                        ],
+                        temperature=0.5,
+                        max_completion_tokens=8192,
+                        top_p=1,
+                        reasoning_effort="high",
+                        stream=True,
+                        stop=None
+                    )
+
+                    print(f"[Supervisor] Streaming response via Groq ({self.model_name})...")
+                    for chunk in completion:
+                        content = chunk.choices[0].delta.content or ""
+                        if content:
+                            print(content, end="", flush=True)
+                            response_content += content
+                    print() # Newline after streaming
+                except Exception as e:
+                    print(f"[Supervisor] Groq inference error: {e}")
+            
+            else:
+                # NVIDIA / LangChain streaming
+                for chunk in self.client.stream([{"role": "user", "content": prompt}]):
+                    # Get reasoning content if available
+                    if chunk.additional_kwargs and "reasoning_content" in chunk.additional_kwargs:
+                        reasoning_content += chunk.additional_kwargs["reasoning_content"]
+                    
+                    # Get main content
+                    if chunk.content:
+                        response_content += chunk.content
             
             # Print reasoning for debugging
             if reasoning_content:
@@ -262,10 +335,12 @@ Output ONLY a valid JSON object. No explanation."""
             target = entry.get('target', '')[:30]
             success = "SUCCESS" if entry.get('success') else "FAILED"
             
-            # Include Vision confirmation if available (proves what was clicked)
+            # Include Vision reasoning/confirmation if available (CRITICAL for correction)
             vision_info = ""
-            if entry.get('vision_confirmed'):
-                vision_info = f" [Vision confirmed: {entry['vision_confirmed'][:50]}...]"
+            if entry.get('vision_reasoning'):
+                vision_info = f"\n  [Vision Agent Feedback: {entry['vision_reasoning']}]"
+            elif entry.get('vision_confirmed'):
+                vision_info = f"\n  [Vision Agent Confirmed: {entry['vision_confirmed']}]"
             
             lines.append(f"- {action} '{target}' -> {success}{vision_info}")
         

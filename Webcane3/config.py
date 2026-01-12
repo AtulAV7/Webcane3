@@ -28,7 +28,10 @@ class Config:
     GEMINI_PLANNING_MODEL: str = "gemini-2.5-flash"
     
     # Model Names - NVIDIA API
+    # Model Names - NVIDIA API
     NVIDIA_VISION_MODEL: str = "mistralai/mistral-large-3-675b-instruct-2512"
+    NVIDIA_SUPERVISOR_MODEL: str = "deepseek-ai/deepseek-v3.1-terminus"  # Default
+    GROQ_SUPERVISOR_MODEL: str = "openai/gpt-oss-120b"                   # Alternative
     NVIDIA_SUPERVISOR_MODEL: str = "deepseek-ai/deepseek-v3.1-terminus"    # ReAct Supervisor with thinking
     NVIDIA_API_URL: str = "https://integrate.api.nvidia.com/v1"  # Base URL for LangChain
     NVIDIA_VISION_URL: str = "https://integrate.api.nvidia.com/v1/chat/completions"  # Full URL for requests

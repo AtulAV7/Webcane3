@@ -197,35 +197,78 @@ class Executor:
                 'error': f'Could not find search input: {target}'
             }
         
+        # Wait for focus to be established
         time.sleep(0.5)
         
-        # Step 2: Clear any existing text and type the query
+        # Step 2: Clear any existing text
         try:
             self.browser.page.keyboard.press("Control+a")
             time.sleep(0.1)
+            self.browser.page.keyboard.press("Delete")
+            time.sleep(0.2)
         except:
             pass
         
-        type_result = self._execute_type(query)
-        if not type_result.get('success'):
+        # Step 3: Type query character by character for reliability
+        print(f"[Executor] Typing query: '{query}'")
+        try:
+            # Use type with delay for better reliability on dynamic pages
+            self.browser.page.keyboard.type(query, delay=50)  # 50ms per char
+            print(f"[Executor] Typed query successfully")
+        except Exception as e:
             self.stats['failures'] += 1
             return {
                 'success': False,
                 'method': 'search_macro',
-                'error': f'Could not type query: {query}'
+                'error': f'Could not type query: {e}'
             }
         
-        time.sleep(0.3)
+        # Wait for autocomplete to settle
+        time.sleep(0.8)
         
-        # Step 3: Press Enter
-        enter_result = self._execute_press_key("Enter")
-        if not enter_result.get('success'):
-            self.stats['failures'] += 1
-            return {
-                'success': False,
-                'method': 'search_macro',
-                'error': 'Could not press Enter'
-            }
+        # Step 4: Dismiss autocomplete with Escape, then press Enter
+        print(f"[Executor] Dismissing autocomplete and pressing Enter...")
+        try:
+            # Get current URL before pressing Enter
+            url_before = self.browser.page.url
+            
+            # Press Escape to dismiss autocomplete dropdown (critical for Google)
+            self.browser.page.keyboard.press("Escape")
+            time.sleep(0.3)
+            
+            # Now press Enter
+            self.browser.page.keyboard.press("Enter")
+            
+            # Wait for navigation/page change with timeout
+            try:
+                self.browser.page.wait_for_load_state('networkidle', timeout=8000)
+            except:
+                time.sleep(2)  # Fallback wait
+            
+            # Verify URL changed (for search, should now contain /search or q=)
+            url_after = self.browser.page.url
+            if url_before != url_after:
+                print(f"[Executor] Navigation detected: {url_after[:80]}")
+            else:
+                # Enter didn't work - try clicking Google Search button as fallback
+                print(f"[Executor] Enter failed, trying to click Search button...")
+                elements = self.browser.extract_elements()
+                for el in elements:
+                    text_lower = (el.get('text') or '').lower()
+                    tag = el.get('tag', '')
+                    if ('search' in text_lower or 'google search' in text_lower) and tag in ['button', 'input']:
+                        if 'lucky' not in text_lower:  # Skip "I'm Feeling Lucky"
+                            click_success = self.browser.click_element(el['id'], elements)
+                            if click_success:
+                                print(f"[Executor] Clicked Search button (ID {el['id']})")
+                                try:
+                                    self.browser.page.wait_for_load_state('networkidle', timeout=8000)
+                                except:
+                                    time.sleep(2)
+                                break
+                
+        except Exception as e:
+            print(f"[Executor] Enter/navigation error: {e}")
         
         self.stats['macro_success'] += 1
         time.sleep(Config.STEP_DELAY)
@@ -413,9 +456,9 @@ class Executor:
             return False
         
         target_lower = target.lower()
-        el_text = (element.get('text', '') or '').lower()
-        el_tag = element.get('tag', '').lower()
-        el_type = element.get('type', '').lower()
+        el_text = (element.get('text') or '').lower()
+        el_tag = (element.get('tag') or '').lower()
+        el_type = (element.get('type') or '').lower()  # Handle None from DOM extraction
         
         # Extract key words from target
         keywords = []
@@ -862,6 +905,8 @@ If no element matches, write: ANSWER: -1"""
                         element_id = self.annotator.get_element_id(display_index)
                         if element_id >= 0:
                             print(f"[Vision Agent] Gemini: display index {display_index} -> element ID {element_id}")
+                            # Store reasoning for feedback loop
+                            self.last_vision_reasoning = f"Vision Agent chose ID {element_id} based on Gemini output: {result[:200]}"
                             return element_id
                     
                 except Exception as e:

@@ -33,7 +33,7 @@ class WebCane:
     - Loop continues until goal is COMPLETE or FAILED
     """
     
-    def __init__(self):
+    def __init__(self, supervisor_model: str = "deepseek"):
         """Initialize WebCane3 ReAct system."""
         print("=" * 60)
         print("WEBCANE3 - ReAct Architecture")
@@ -42,7 +42,7 @@ class WebCane:
         # Initialize components
         self.browser = BrowserController()
         self.observer = Observer()
-        self.supervisor = Supervisor()
+        self.supervisor = Supervisor(supervisor_model=supervisor_model)
         self.executor = Executor(browser=self.browser)
         self.url_extractor = URLExtractor()
         

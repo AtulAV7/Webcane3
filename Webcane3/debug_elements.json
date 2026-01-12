@@ -2,855 +2,113 @@
   {
     "id": 0,
     "tag": "button",
-    "text": "Guide",
-    "type": "button",
+    "text": "Upload File",
+    "type": "submit",
     "bbox": {
-      "x": 24,
-      "y": 16,
-      "w": 24,
-      "h": 24
+      "x": 1155,
+      "y": 445,
+      "w": 175,
+      "h": 51
     },
-    "html_id": "button",
-    "html_classes": "style-scope yt-icon-button"
+    "html_id": "",
+    "html_classes": "upload-button"
   },
   {
     "id": 1,
     "tag": "button",
-    "text": "Search",
-    "type": "button",
+    "text": "Save",
+    "type": "submit",
     "bbox": {
-      "x": 930,
-      "y": 8,
-      "w": 64,
-      "h": 40
+      "x": 580,
+      "y": 825,
+      "w": 120,
+      "h": 49
     },
     "html_id": "",
-    "html_classes": "ytSearchboxComponentSearchButton"
+    "html_classes": "save-button"
   },
   {
     "id": 2,
     "tag": "button",
-    "text": "Search with your voice",
-    "type": "button",
+    "text": "Lock",
+    "type": "submit",
     "bbox": {
-      "x": 1010,
-      "y": 8,
-      "w": 40,
-      "h": 40
+      "x": 740,
+      "y": 825,
+      "w": 120,
+      "h": 49
     },
     "html_id": "",
-    "html_classes": "yt-spec-button-shape-next yt-spec-button-shape-next--text yt-spec-button-shape-next--mono yt-spec-button-shape-next--size-m yt-spec-button-shape-next--icon-only-default yt-spec-button-shape-next--enable-backdrop-filter-experiment"
+    "html_classes": "lock-button"
   },
   {
     "id": 3,
-    "tag": "button",
-    "text": "Settings",
-    "type": "button",
+    "tag": "a",
+    "text": "Home",
+    "type": null,
     "bbox": {
-      "x": 1271,
-      "y": 16,
-      "w": 24,
-      "h": 24
+      "x": 65,
+      "y": 26,
+      "w": 64,
+      "h": 33
     },
-    "html_id": "button",
-    "html_classes": "style-scope yt-icon-button"
+    "html_id": "",
+    "html_classes": "nav-button active"
   },
   {
     "id": 4,
-    "tag": "button",
-    "text": "Pause (k)",
-    "type": "button",
-    "bbox": {
-      "x": 28,
-      "y": 568,
-      "w": 40,
-      "h": 40
-    },
-    "html_id": "",
-    "html_classes": "ytp-play-button ytp-button"
-  },
-  {
-    "id": 5,
-    "tag": "button",
-    "text": "Unmute (m)",
-    "type": "button",
-    "bbox": {
-      "x": 80,
-      "y": 568,
-      "w": 40,
-      "h": 40
-    },
-    "html_id": "",
-    "html_classes": "ytp-volume-icon ytp-button"
-  },
-  {
-    "id": 6,
-    "tag": "button",
-    "text": "Autoplay is on",
-    "type": "button",
-    "bbox": {
-      "x": 735,
-      "y": 568,
-      "w": 48,
-      "h": 40
-    },
-    "html_id": "",
-    "html_classes": "ytp-button ytp-autonav-toggle"
-  },
-  {
-    "id": 7,
-    "tag": "button",
-    "text": "Subtitles/closed captions unavailable",
-    "type": "button",
-    "bbox": {
-      "x": 783,
-      "y": 568,
-      "w": 48,
-      "h": 40
-    },
-    "html_id": "",
-    "html_classes": "ytp-subtitles-button ytp-button"
-  },
-  {
-    "id": 8,
-    "tag": "button",
-    "text": "Settings",
-    "type": "button",
-    "bbox": {
-      "x": 831,
-      "y": 568,
-      "w": 48,
-      "h": 40
-    },
-    "html_id": "",
-    "html_classes": "ytp-button ytp-settings-button"
-  },
-  {
-    "id": 9,
-    "tag": "button",
-    "text": "Theater mode (t)",
-    "type": "button",
-    "bbox": {
-      "x": 879,
-      "y": 568,
-      "w": 48,
-      "h": 40
-    },
-    "html_id": "",
-    "html_classes": "ytp-size-button ytp-button"
-  },
-  {
-    "id": 10,
-    "tag": "button",
-    "text": "Full screen (f)",
-    "type": "button",
-    "bbox": {
-      "x": 927,
-      "y": 568,
-      "w": 48,
-      "h": 40
-    },
-    "html_id": "",
-    "html_classes": "ytp-fullscreen-button ytp-button"
-  },
-  {
-    "id": 11,
-    "tag": "button",
-    "text": "Join this channel",
-    "type": "button",
-    "bbox": {
-      "x": 224,
-      "y": 668,
-      "w": 59,
-      "h": 36
-    },
-    "html_id": "",
-    "html_classes": "yt-spec-button-shape-next yt-spec-button-shape-next--tonal yt-spec-button-shape-next--mono yt-spec-button-shape-next--size-m yt-spec-button-shape-next--enable-backdrop-filter-experiment"
-  },
-  {
-    "id": 12,
-    "tag": "button",
-    "text": "Subscribe to Teaser Universe.",
-    "type": "button",
-    "bbox": {
-      "x": 291,
-      "y": 668,
-      "w": 95,
-      "h": 36
-    },
-    "html_id": "",
-    "html_classes": "yt-spec-button-shape-next yt-spec-button-shape-next--filled yt-spec-button-shape-next--mono yt-spec-button-shape-next--size-m yt-spec-button-shape-next--enable-backdrop-filter-experiment"
-  },
-  {
-    "id": 13,
-    "tag": "button",
-    "text": "like this video along with 160 other people",
-    "type": "button",
-    "bbox": {
-      "x": 486,
-      "y": 668,
-      "w": 80,
-      "h": 36
-    },
-    "html_id": "",
-    "html_classes": "yt-spec-button-shape-next yt-spec-button-shape-next--tonal yt-spec-button-shape-next--mono yt-spec-button-shape-next--size-m yt-spec-button-shape-next--icon-leading yt-spec-button-shape-next--segmented-start yt-spec-button-shape-next--enable-backdrop-filter-experiment"
-  },
-  {
-    "id": 14,
-    "tag": "button",
-    "text": "Dislike this video",
-    "type": "button",
-    "bbox": {
-      "x": 566,
-      "y": 668,
-      "w": 52,
-      "h": 36
-    },
-    "html_id": "",
-    "html_classes": "yt-spec-button-shape-next yt-spec-button-shape-next--tonal yt-spec-button-shape-next--mono yt-spec-button-shape-next--size-m yt-spec-button-shape-next--icon-button yt-spec-button-shape-next--segmented-end yt-spec-button-shape-next--enable-backdrop-filter-experiment"
-  },
-  {
-    "id": 15,
-    "tag": "button",
-    "text": "Share",
-    "type": "button",
-    "bbox": {
-      "x": 626,
-      "y": 668,
-      "w": 92,
-      "h": 36
-    },
-    "html_id": "",
-    "html_classes": "yt-spec-button-shape-next yt-spec-button-shape-next--tonal yt-spec-button-shape-next--mono yt-spec-button-shape-next--size-m yt-spec-button-shape-next--icon-leading yt-spec-button-shape-next--enable-backdrop-filter-experiment"
-  },
-  {
-    "id": 16,
-    "tag": "button",
-    "text": "Save to playlist",
-    "type": "button",
-    "bbox": {
-      "x": 726,
-      "y": 668,
-      "w": 86,
-      "h": 36
-    },
-    "html_id": "",
-    "html_classes": "yt-spec-button-shape-next yt-spec-button-shape-next--tonal yt-spec-button-shape-next--mono yt-spec-button-shape-next--size-m yt-spec-button-shape-next--icon-leading yt-spec-button-shape-next--enable-backdrop-filter-experiment"
-  },
-  {
-    "id": 17,
-    "tag": "button",
-    "text": "Download",
-    "type": "button",
-    "bbox": {
-      "x": 821,
-      "y": 668,
-      "w": 118,
-      "h": 36
-    },
-    "html_id": "",
-    "html_classes": "yt-spec-button-shape-next yt-spec-button-shape-next--tonal yt-spec-button-shape-next--mono yt-spec-button-shape-next--size-m yt-spec-button-shape-next--icon-leading yt-spec-button-shape-next--enable-backdrop-filter-experiment"
-  },
-  {
-    "id": 18,
-    "tag": "button",
-    "text": "More actions",
-    "type": "button",
-    "bbox": {
-      "x": 955,
-      "y": 668,
-      "w": 36,
-      "h": 36
-    },
-    "html_id": "",
-    "html_classes": "yt-spec-button-shape-next yt-spec-button-shape-next--tonal yt-spec-button-shape-next--mono yt-spec-button-shape-next--size-m yt-spec-button-shape-next--icon-button yt-spec-button-shape-next--enable-backdrop-filter-experiment"
-  },
-  {
-    "id": 19,
-    "tag": "button",
-    "text": "More actions",
-    "type": "button",
-    "bbox": {
-      "x": 1383,
-      "y": 62,
-      "w": 36,
-      "h": 36
-    },
-    "html_id": "",
-    "html_classes": "yt-spec-button-shape-next yt-spec-button-shape-next--text yt-spec-button-shape-next--mono yt-spec-button-shape-next--size-m yt-spec-button-shape-next--icon-button yt-spec-button-shape-next--enable-backdrop-filter-experiment"
-  },
-  {
-    "id": 20,
-    "tag": "button",
-    "text": "More actions",
-    "type": "button",
-    "bbox": {
-      "x": 1383,
-      "y": 165,
-      "w": 36,
-      "h": 36
-    },
-    "html_id": "",
-    "html_classes": "yt-spec-button-shape-next yt-spec-button-shape-next--text yt-spec-button-shape-next--mono yt-spec-button-shape-next--size-m yt-spec-button-shape-next--icon-button yt-spec-button-shape-next--enable-backdrop-filter-experiment"
-  },
-  {
-    "id": 21,
-    "tag": "button",
-    "text": "More actions",
-    "type": "button",
-    "bbox": {
-      "x": 1383,
-      "y": 267,
-      "w": 36,
-      "h": 36
-    },
-    "html_id": "",
-    "html_classes": "yt-spec-button-shape-next yt-spec-button-shape-next--text yt-spec-button-shape-next--mono yt-spec-button-shape-next--size-m yt-spec-button-shape-next--icon-button yt-spec-button-shape-next--enable-backdrop-filter-experiment"
-  },
-  {
-    "id": 22,
-    "tag": "button",
-    "text": "More actions",
-    "type": "button",
-    "bbox": {
-      "x": 1383,
-      "y": 375,
-      "w": 36,
-      "h": 36
-    },
-    "html_id": "",
-    "html_classes": "yt-spec-button-shape-next yt-spec-button-shape-next--text yt-spec-button-shape-next--mono yt-spec-button-shape-next--size-m yt-spec-button-shape-next--icon-button yt-spec-button-shape-next--enable-backdrop-filter-experiment"
-  },
-  {
-    "id": 23,
-    "tag": "button",
-    "text": "More actions",
-    "type": "button",
-    "bbox": {
-      "x": 1383,
-      "y": 483,
-      "w": 36,
-      "h": 36
-    },
-    "html_id": "",
-    "html_classes": "yt-spec-button-shape-next yt-spec-button-shape-next--text yt-spec-button-shape-next--mono yt-spec-button-shape-next--size-m yt-spec-button-shape-next--icon-button yt-spec-button-shape-next--enable-backdrop-filter-experiment"
-  },
-  {
-    "id": 24,
-    "tag": "button",
-    "text": "More actions",
-    "type": "button",
-    "bbox": {
-      "x": 1383,
-      "y": 586,
-      "w": 36,
-      "h": 36
-    },
-    "html_id": "",
-    "html_classes": "yt-spec-button-shape-next yt-spec-button-shape-next--text yt-spec-button-shape-next--mono yt-spec-button-shape-next--size-m yt-spec-button-shape-next--icon-button yt-spec-button-shape-next--enable-backdrop-filter-experiment"
-  },
-  {
-    "id": 25,
-    "tag": "button",
-    "text": "More actions",
-    "type": "button",
-    "bbox": {
-      "x": 1383,
-      "y": 694,
-      "w": 36,
-      "h": 36
-    },
-    "html_id": "",
-    "html_classes": "yt-spec-button-shape-next yt-spec-button-shape-next--text yt-spec-button-shape-next--mono yt-spec-button-shape-next--size-m yt-spec-button-shape-next--icon-button yt-spec-button-shape-next--enable-backdrop-filter-experiment"
-  },
-  {
-    "id": 26,
-    "tag": "button",
-    "text": "More actions",
-    "type": "button",
-    "bbox": {
-      "x": 1383,
-      "y": 796,
-      "w": 36,
-      "h": 36
-    },
-    "html_id": "",
-    "html_classes": "yt-spec-button-shape-next yt-spec-button-shape-next--text yt-spec-button-shape-next--mono yt-spec-button-shape-next--size-m yt-spec-button-shape-next--icon-button yt-spec-button-shape-next--enable-backdrop-filter-experiment"
-  },
-  {
-    "id": 27,
-    "tag": "button",
-    "text": "More actions",
-    "type": "button",
-    "bbox": {
-      "x": 1383,
-      "y": 899,
-      "w": 36,
-      "h": 36
-    },
-    "html_id": "",
-    "html_classes": "yt-spec-button-shape-next yt-spec-button-shape-next--text yt-spec-button-shape-next--mono yt-spec-button-shape-next--size-m yt-spec-button-shape-next--icon-button yt-spec-button-shape-next--enable-backdrop-filter-experiment"
-  },
-  {
-    "id": 28,
     "tag": "a",
-    "text": "YouTube Home",
-    "type": "button",
+    "text": "Join the Club",
+    "type": null,
     "bbox": {
-      "x": 56,
-      "y": 0,
-      "w": 123,
-      "h": 56
-    },
-    "html_id": "logo",
-    "html_classes": "yt-simple-endpoint style-scope ytd-topbar-logo-renderer"
-  },
-  {
-    "id": 29,
-    "tag": "a",
-    "text": "",
-    "type": "button",
-    "bbox": {
-      "x": 1263,
-      "y": 8,
-      "w": 40,
-      "h": 40
-    },
-    "html_id": "",
-    "html_classes": "yt-simple-endpoint style-scope ytd-topbar-menu-button-renderer"
-  },
-  {
-    "id": 30,
-    "tag": "a",
-    "text": "Sign in",
-    "type": "button",
-    "bbox": {
-      "x": 1311,
-      "y": 10,
+      "x": 662,
+      "y": 119,
       "w": 98,
-      "h": 36
-    },
-    "html_id": "",
-    "html_classes": "yt-spec-button-shape-next yt-spec-button-shape-next--outline yt-spec-button-shape-next--call-to-action yt-spec-button-shape-next--size-m yt-spec-button-shape-next--icon-leading yt-spec-button-shape-next--enable-backdrop-filter-experiment"
-  },
-  {
-    "id": 31,
-    "tag": "a",
-    "text": "",
-    "type": "button",
-    "bbox": {
-      "x": 16,
-      "y": 68,
-      "w": 975,
-      "h": 548
-    },
-    "html_id": "thumbnail",
-    "html_classes": "yt-simple-endpoint inline-block style-scope ytd-thumbnail"
-  },
-  {
-    "id": 32,
-    "tag": "a",
-    "text": "Learn more",
-    "type": "button",
-    "bbox": {
-      "x": 317,
-      "y": 341,
-      "w": 112,
-      "h": 26
-    },
-    "html_id": "",
-    "html_classes": "ytp-error-link"
-  },
-  {
-    "id": 33,
-    "tag": "a",
-    "text": "",
-    "type": "button",
-    "bbox": {
-      "x": 16,
-      "y": 664,
-      "w": 52,
-      "h": 42
-    },
-    "html_id": "",
-    "html_classes": "yt-simple-endpoint style-scope ytd-video-owner-renderer"
-  },
-  {
-    "id": 34,
-    "tag": "a",
-    "text": "Teaser Universe",
-    "type": "button",
-    "bbox": {
-      "x": 68,
-      "y": 666,
-      "w": 117,
       "h": 22
     },
     "html_id": "",
-    "html_classes": "yt-simple-endpoint style-scope yt-formatted-string"
+    "html_classes": ""
   },
   {
-    "id": 35,
+    "id": 5,
     "tag": "a",
-    "text": "#doomsday",
-    "type": "button",
-    "bbox": {
-      "x": 190,
-      "y": 731,
-      "w": 74,
-      "h": 20
-    },
-    "html_id": "",
-    "html_classes": "yt-simple-endpoint style-scope yt-formatted-string"
-  },
-  {
-    "id": 36,
-    "tag": "a",
-    "text": "#avengers",
-    "type": "button",
-    "bbox": {
-      "x": 268,
-      "y": 731,
-      "w": 66,
-      "h": 20
-    },
-    "html_id": "",
-    "html_classes": "yt-simple-endpoint style-scope yt-formatted-string"
-  },
-  {
-    "id": 37,
-    "tag": "a",
-    "text": "#marvel",
-    "type": "button",
-    "bbox": {
-      "x": 337,
-      "y": 731,
-      "w": 51,
-      "h": 20
-    },
-    "html_id": "",
-    "html_classes": "yt-simple-endpoint style-scope yt-formatted-string"
-  },
-  {
-    "id": 38,
-    "tag": "a",
-    "text": "6:09",
-    "type": "button",
-    "bbox": {
-      "x": 1007,
-      "y": 68,
-      "w": 176,
-      "h": 95
-    },
-    "html_id": "",
-    "html_classes": "yt-lockup-view-model__content-image"
-  },
-  {
-    "id": 39,
-    "tag": "a",
-    "text": "Dr. Doom Arrives In New York (2025) Avengers: Doomsday Teaser | The Fantastic Four: First Steps Clip",
-    "type": "button",
-    "bbox": {
-      "x": 1183,
-      "y": 68,
-      "w": 226,
-      "h": 40
-    },
-    "html_id": "",
-    "html_classes": "yt-lockup-metadata-view-model__title"
-  },
-  {
-    "id": 40,
-    "tag": "a",
-    "text": "4:56",
-    "type": "button",
-    "bbox": {
-      "x": 1007,
-      "y": 171,
-      "w": 176,
-      "h": 95
-    },
-    "html_id": "",
-    "html_classes": "yt-lockup-view-model__content-image"
-  },
-  {
-    "id": 41,
-    "tag": "a",
-    "text": "Superman vs Justice League | Justice League 4k SDR 4 minutes, 56 seconds",
-    "type": "button",
-    "bbox": {
-      "x": 1183,
-      "y": 171,
-      "w": 226,
-      "h": 40
-    },
-    "html_id": "",
-    "html_classes": "yt-lockup-metadata-view-model__title"
-  },
-  {
-    "id": 42,
-    "tag": "a",
-    "text": "2:33",
-    "type": "button",
-    "bbox": {
-      "x": 1007,
-      "y": 273,
-      "w": 176,
-      "h": 100
-    },
-    "html_id": "",
-    "html_classes": "yt-lockup-view-model__content-image"
-  },
-  {
-    "id": 43,
-    "tag": "a",
-    "text": "Nari Nari Naduma Murari Trailer | Sharwanand | Samyuktha | Sakshi Vaidya 2 minutes, 33 seconds",
-    "type": "button",
-    "bbox": {
-      "x": 1183,
-      "y": 273,
-      "w": 226,
-      "h": 40
-    },
-    "html_id": "",
-    "html_classes": "yt-lockup-metadata-view-model__title"
-  },
-  {
-    "id": 44,
-    "tag": "a",
-    "text": "1:01",
-    "type": "button",
-    "bbox": {
-      "x": 1007,
-      "y": 381,
-      "w": 176,
-      "h": 100
-    },
-    "html_id": "",
-    "html_classes": "yt-lockup-view-model__content-image"
-  },
-  {
-    "id": 45,
-    "tag": "a",
-    "text": "Avengers: Doomsday - Trailer 4 \"The Wakandans & The Fantastic 4 Will Return\" (Concept Version) 1 min",
-    "type": "button",
-    "bbox": {
-      "x": 1183,
-      "y": 381,
-      "w": 226,
-      "h": 40
-    },
-    "html_id": "",
-    "html_classes": "yt-lockup-metadata-view-model__title"
-  },
-  {
-    "id": 46,
-    "tag": "a",
-    "text": "18:11",
-    "type": "button",
-    "bbox": {
-      "x": 1007,
-      "y": 489,
-      "w": 176,
-      "h": 95
-    },
-    "html_id": "",
-    "html_classes": "yt-lockup-view-model__content-image"
-  },
-  {
-    "id": 47,
-    "tag": "a",
-    "text": "Doctor Strange Tried to Stop Doctor Doom, He Failed. 18 minutes",
-    "type": "button",
-    "bbox": {
-      "x": 1183,
-      "y": 489,
-      "w": 226,
-      "h": 40
-    },
-    "html_id": "",
-    "html_classes": "yt-lockup-metadata-view-model__title"
-  },
-  {
-    "id": 48,
-    "tag": "a",
-    "text": "3:24",
-    "type": "button",
-    "bbox": {
-      "x": 1007,
-      "y": 592,
-      "w": 176,
-      "h": 100
-    },
-    "html_id": "",
-    "html_classes": "yt-lockup-view-model__content-image"
-  },
-  {
-    "id": 49,
-    "tag": "a",
-    "text": "Avengers: Doomsday _ X-Men Reveal Trailer (2026) Marvel 4K 3 minutes, 24 seconds",
-    "type": "button",
-    "bbox": {
-      "x": 1183,
-      "y": 592,
-      "w": 226,
-      "h": 40
-    },
-    "html_id": "",
-    "html_classes": "yt-lockup-metadata-view-model__title"
-  },
-  {
-    "id": 50,
-    "tag": "a",
-    "text": "3:12",
-    "type": "button",
-    "bbox": {
-      "x": 1007,
-      "y": 700,
-      "w": 176,
-      "h": 95
-    },
-    "html_id": "",
-    "html_classes": "yt-lockup-view-model__content-image"
-  },
-  {
-    "id": 51,
-    "tag": "a",
-    "text": "The RajaSaab Trailer 2.0 (Hindi) | Prabhas | Maruthi | Thaman S | TG Vishwa Prasad 3 minutes, 12 sec",
-    "type": "button",
-    "bbox": {
-      "x": 1183,
-      "y": 700,
-      "w": 226,
-      "h": 40
-    },
-    "html_id": "",
-    "html_classes": "yt-lockup-metadata-view-model__title"
-  },
-  {
-    "id": 52,
-    "tag": "a",
-    "text": "5:09",
-    "type": "button",
-    "bbox": {
-      "x": 1007,
-      "y": 802,
-      "w": 176,
-      "h": 95
-    },
-    "html_id": "",
-    "html_classes": "yt-lockup-view-model__content-image"
-  },
-  {
-    "id": 53,
-    "tag": "a",
-    "text": "What If Stranger Things happened In India? ft. @rohanjoshi8016 and Vrajesh Hirji | Netflix India 5 m",
-    "type": "button",
-    "bbox": {
-      "x": 1183,
-      "y": 802,
-      "w": 226,
-      "h": 40
-    },
-    "html_id": "",
-    "html_classes": "yt-lockup-metadata-view-model__title"
-  },
-  {
-    "id": 54,
-    "tag": "input",
-    "text": "Search",
-    "type": "text",
-    "bbox": {
-      "x": 411,
-      "y": 16,
-      "w": 515,
-      "h": 24
-    },
-    "html_id": "",
-    "html_classes": "ytSearchboxComponentInput yt-searchbox-input title"
-  },
-  {
-    "id": 55,
-    "tag": "div",
-    "text": "0 Minutes 41 Seconds of 1 Minutes 10 Seconds",
-    "type": "button",
-    "bbox": {
-      "x": 144,
-      "y": 568,
-      "w": 67,
-      "h": 40
-    },
-    "html_id": "",
-    "html_classes": "ytp-time-contents"
-  },
-  {
-    "id": 56,
-    "tag": "tp-yt-paper-button",
-    "text": "...more",
-    "type": "button",
-    "bbox": {
-      "x": 469,
-      "y": 791,
-      "w": 44,
-      "h": 20
-    },
-    "html_id": "expand",
-    "html_classes": "button style-scope ytd-text-inline-expander"
-  },
-  {
-    "id": 57,
-    "tag": "tp-yt-paper-button",
-    "text": "Sort comments",
-    "type": "button",
-    "bbox": {
-      "x": 163,
-      "y": 846,
-      "w": 80,
-      "h": 24
-    },
-    "html_id": "label",
-    "html_classes": "dropdown-trigger style-scope yt-dropdown-menu"
-  },
-  {
-    "id": 58,
-    "tag": "div",
-    "text": "YouTube Video Player",
-    "type": "button",
-    "bbox": {
-      "x": 16,
-      "y": 68,
-      "w": 975,
-      "h": 548
-    },
-    "html_id": "movie_player",
-    "html_classes": "html5-video-player ytp-transparent ytp-exp-bottom-control-flexbox ytp-modern-caption ytp-exp-ppp-update ytp-livebadge-color ytp-grid-scrollable ytp-delhi-modern-compact-controls ad-created ytp-delhi-modern ytp-delhi-modern-icons ytp-delhi-horizontal-volume-controls ytp-fit-cover-video ytp-fine-scrubbing-exp ytp-cards-teaser-dismissible ytp-hide-info-bar ytp-large-width-mode ytp-disable-bottom-gradient ytp-autonav-endscreen-cancelled-state ytp-hide-fullscreen-title ytp-fullscreen-metadata-top ytp-autohide ytp-probably-keyboard-focus"
-  },
-  {
-    "id": 59,
-    "tag": "video",
     "text": "",
-    "type": "button",
+    "type": null,
     "bbox": {
-      "x": 16,
-      "y": 68,
-      "w": 975,
-      "h": 548
+      "x": 1272,
+      "y": 122,
+      "w": 20,
+      "h": 24
     },
     "html_id": "",
-    "html_classes": "video-stream html5-main-video"
+    "html_classes": ""
   },
   {
-    "id": 60,
-    "tag": "div",
-    "text": "Seek slider",
-    "type": "button",
+    "id": 6,
+    "tag": "a",
+    "text": "",
+    "type": null,
     "bbox": {
-      "x": 28,
-      "y": 554,
-      "w": 951,
-      "h": 6
+      "x": 1302,
+      "y": 122,
+      "w": 20,
+      "h": 24
     },
     "html_id": "",
-    "html_classes": "ytp-progress-bar"
+    "html_classes": ""
+  },
+  {
+    "id": 7,
+    "tag": "textarea",
+    "text": "Enter text and hit save button",
+    "type": "textarea",
+    "bbox": {
+      "x": 74,
+      "y": 150,
+      "w": 1022,
+      "h": 658
+    },
+    "html_id": "",
+    "html_classes": "inner-text-area"
   }
 ]

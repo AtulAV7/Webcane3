@@ -133,7 +133,7 @@ class BrowserController:
                     'option', 'li', '[role="option"]', '[role="listbox"]', '[role="menu"]',
                     '[role="menuitem"]', '[role="listitem"]', '[role="combobox"]',
                     // Additional clickable elements
-                    'label', '[data-value]', '[data-option]'
+                    '[data-value]', '[data-option]'
                 ];
                 
                 const allElements = new Set();
@@ -184,11 +184,19 @@ class BrowserController:
                         
                         text = (text || "").replace(/\\s+/g, ' ').trim().substring(0, 100);
 
+                        // Assign type only when it makes sense
+                        let typeValue = null;
+                        if (el.tagName === 'INPUT') typeValue = el.type || 'text';
+                        else if (el.tagName === 'BUTTON') typeValue = el.type || 'button';
+                        else if (el.tagName === 'SELECT') typeValue = 'select';
+                        else if (el.tagName === 'TEXTAREA') typeValue = 'textarea';
+                        // For others (links, role=button etc) leave as null or undefined
+
                         elements.push({
                             id: id++,
                             tag: el.tagName.toLowerCase(),
                             text: text,
-                            type: el.tagName === 'INPUT' ? (el.type || 'text') : 'button',
+                            type: typeValue,  // Fixed: no longer defaulting to 'button'
                             bbox: {
                                 x: Math.round(rect.x),
                                 y: Math.round(rect.y),

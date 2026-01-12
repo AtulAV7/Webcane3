@@ -8,14 +8,33 @@ from Webcane3.main import WebCane
 from Webcane3.voice_interface import VoiceInterface
 
 
+def select_model():
+    """Let user choose supervisor model."""
+    print("\n" + "-" * 60)
+    print("SUPERVISOR MODEL SELECTION")
+    print("-" * 60)
+    print("  [1] NVIDIA DeepSeek-V3.1 (Default) - Thinking enabled")
+    print("  [2] Groq OpenAI GPT-OSS-120b - Fast inference")
+    print("-" * 60)
+    
+    while True:
+        choice = input("Enter choice (1 or 2): ").strip()
+        if choice == "1" or choice == "":
+            return "deepseek"
+        elif choice == "2":
+            return "gpt-oss"
+        else:
+            print("Please enter 1 or 2")
+
+
 def select_mode():
     """Let user choose input mode."""
-    print("\n" + "=" * 60)
+    print("\n" + "-" * 60)
     print("ACCESSIBILITY MODE SELECTION")
-    print("=" * 60)
+    print("-" * 60)
     print("  [1] Voice Mode - Speak your goals (for visually impaired)")
     print("  [2] Text Mode  - Type your goals")
-    print("=" * 60)
+    print("-" * 60)
     
     while True:
         choice = input("Enter choice (1 or 2): ").strip()
@@ -33,8 +52,11 @@ def main():
     print("=" * 60)
     print("\nInitializing...")
     
-    # Initialize WebCane
-    webcane = WebCane()
+    # Model selection
+    sup_model_key = select_model()
+    
+    # Initialize WebCane with selected model
+    webcane = WebCane(supervisor_model=sup_model_key)
     
     # Initialize Voice Interface
     voice = VoiceInterface()

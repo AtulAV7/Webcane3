@@ -145,9 +145,14 @@ Provide a DETAILED JSON response with these fields:
 
 1. "page_state": A detailed description of the current page including:
    - What website this is
-   - What page/section we're on (homepage, search results, product page, video page, etc.)
-   - What content is visible (search results list, video player, product grid, etc.)
-   - General page layout description
+   - What page/section we're on (homepage, search results, product page, etc.)
+   - DETAILED CONTENT STATE:
+     * Checkbox states: Mention exactly which checkboxes are CHECKED or UNCHECKED
+     * Radio buttons: Mention which option is selected
+     * Dropdowns: Mention the current selected value
+     * Input fields: Mention if they have text in them or are empty
+     * Buttons: Mention if any are disabled or loading
+     * Errors: Describe any visible error messages or validation alerts
 
 2. "blockers": An array of blocking elements that must be handled first:
    - Popups, modals, overlays
@@ -158,23 +163,23 @@ Provide a DETAILED JSON response with these fields:
    Empty array if none visible.
 
 3. "previous_action_result": If there was a previous action, analyze if it worked:
-   - "SUCCESS - [detailed evidence]" (e.g., "SUCCESS - search results page now shows results for 'samsung phones', total 48 products visible")
-   - "FAILED - [detailed reason]" (e.g., "FAILED - still on homepage, search was not executed, search bar still empty")
-   - "PARTIAL - [explanation]" (e.g., "PARTIAL - clicked but page is still loading")
+   - "SUCCESS - [detailed evidence]" (e.g., "SUCCESS - search results now visible for 'phones', URL changed to /search")
+   - "FAILED - [detailed reason]" (e.g., "FAILED - still on login page, error message 'Invalid password' visible")
+   - "PARTIAL - [explanation]"
    - "N/A" if no previous action
 
-4. "key_elements": Array of 5-8 notable interactive elements visible that could help achieve the goal:
-   - Be specific with descriptions
-   - Include position hints (top, center, left sidebar, etc.)
-   - For search results: mention product names, video titles, etc.
-   - Example: ["Search bar at top center", "First product: Samsung Galaxy S24 - Rs 74,999", "Filter by Price button on left", "Sort dropdown showing 'Relevance'"]
+4. "key_elements": Array of 5-8 notable interactive elements visible:
+   - Be specific with descriptions and STATES (e.g., "Submit button [Disabled]", "Type checkbox [Checked]")
+   - Include position hints
+   - For lists/grids: mention items by name and position
+   - Example: ["Search bar (empty) at top", "Submit button (enabled) bottom right", "'Terms' checkbox (unchecked)", "Category dropdown (selected: 'All')"]
 
 5. "goal_progress": Brief assessment of how close we are to completing the goal:
-   - "NOT_STARTED" - Haven't begun working on the goal
-   - "IN_PROGRESS" - Working towards the goal
-   - "ALMOST_DONE" - One or two steps away from completion
-   - "COMPLETE" - Goal appears to be achieved
-   - "BLOCKED" - Cannot proceed due to blockers
+   - "NOT_STARTED"
+   - "IN_PROGRESS"
+   - "ALMOST_DONE"
+   - "COMPLETE"
+   - "BLOCKED"
 
 Example response:
 {{
