@@ -46,6 +46,25 @@ def select_mode():
             print("Please enter 1 or 2")
 
 
+def select_execution_mode():
+    """Let user choose execution mode."""
+    print("\n" + "-" * 60)
+    print("EXECUTION MODE SELECTION")
+    print("-" * 60)
+    print("  [1] Hybrid (DOM + Vision Fallback) - Standard")
+    print("  [2] VLM Only (Fine-tuned Qwen2-VL) - All clicks via Vision")
+    print("-" * 60)
+    
+    while True:
+        choice = input("Enter choice (1 or 2): ").strip()
+        if choice == "1" or choice == "":
+            return False
+        elif choice == "2":
+            return True
+        else:
+            print("Please enter 1 or 2")
+
+
 def main():
     print("=" * 60)
     print("WEBCANE3 - ReAct Interactive Mode")
@@ -55,8 +74,14 @@ def main():
     # Model selection
     sup_model_key = select_model()
     
-    # Initialize WebCane with selected model
-    webcane = WebCane(supervisor_model=sup_model_key)
+    # Execution mode selection
+    vlm_only = select_execution_mode()
+    
+    # Initialize WebCane with selected model and mode
+    webcane = WebCane(
+        supervisor_model=sup_model_key,
+        vlm_only_mode=vlm_only
+    )
     
     # Initialize Voice Interface
     voice = VoiceInterface()

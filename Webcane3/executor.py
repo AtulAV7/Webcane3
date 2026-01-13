@@ -29,6 +29,13 @@ try:
 except ImportError:
     GENAI_AVAILABLE = False
 
+# Fine-tuned VLM imports
+try:
+    from .fine_tuned_vlm import FineTunedVLM, QWEN_VLM_AVAILABLE
+    FINE_TUNED_VLM_AVAILABLE = QWEN_VLM_AVAILABLE
+except ImportError:
+    FINE_TUNED_VLM_AVAILABLE = False
+
 
 class Executor:
     """
@@ -42,7 +49,8 @@ class Executor:
         self, 
         browser: BrowserController,
         groq_api_key: str = None,
-        gemini_api_key: str = None
+        gemini_api_key: str = None,
+        vlm_only_mode: bool = False
     ):
         """
         Initialize the executor.
@@ -51,9 +59,14 @@ class Executor:
             browser: BrowserController instance
             groq_api_key: Groq API key for DOM text matching
             gemini_api_key: Gemini API key for Vision fallback
+            vlm_only_mode: If True, uses fine-tuned VLM for ALL click actions
         """
         self.browser = browser
         self.annotator = SoMAnnotator()
+        self.vlm_only_mode = vlm_only_mode
+        
+        if self.vlm_only_mode:
+            print("[Executor] INITIALIZED IN VLM-ONLY MODE")
         
         # Groq client for DOM text matching
         self.groq_client = None
@@ -90,6 +103,16 @@ class Executor:
         
         # Store Vision agent's reasoning for verification (passed to Supervisor)
         self.last_vision_reasoning = None
+        
+        # Fine-tuned VLM fallback (lazy loaded to save VRAM)
+        self.fine_tuned_vlm = None
+        if FINE_TUNED_VLM_AVAILABLE:
+            adapter_path = os.path.join(
+                os.path.dirname(__file__), 
+                "archive"
+            )
+            self.fine_tuned_vlm = FineTunedVLM(adapter_path)
+            print("[Executor] Fine-tuned VLM ready for fallback")
     
     def execute_action(self, action: Dict) -> Dict:
         """
@@ -584,6 +607,74 @@ class Executor:
             
             page_info = self.browser.get_page_info()
             
+            # --- VLM ONLY MODE ---
+            if self.vlm_only_mode and self.fine_tuned_vlm and self.fine_tuned_vlm.is_available():
+                print(f"[Executor] VLM-ONLY MODE: Using fine-tuned model for '{target}'")
+                screenshot = self.browser.take_screenshot()
+                if screenshot:
+                    # Construct simple prompt like "Click {target}"
+                    prompt = f"Click {target}"
+                    if "click" in target.lower():
+                         prompt = target
+                    
+                    element_id = self._try_fine_tuned_vlm(screenshot, prompt, elements)
+                    if element_id >= 0:
+                        if self.browser.click_element(element_id, elements):
+                            self.stats['vision_success'] += 1
+                            time.sleep(Config.STEP_DELAY)
+                            return {
+                                'success': True,
+                                'method': 'vlm_only',
+                                'element_id': element_id,
+                                'vision_reasoning': f"VLM-ONLY: {prompt}"
+                            }
+                print("[Executor] VLM-only mode failed to find element")
+                # Even if failed, in strict VLM-only mode we might want to stop or fallback?
+                # For now, let's allow fallback to standard flow so the agent doesn't get stuck, 
+                # but print a warning. Or user requested "only fine tuned VLM", implies strict.
+                # User said: "if i choose VLM , then all the clicks will be done by VLM output based."
+                # Let's return failure if VLM fails to respect the "VLM Only" constraint stricly.
+                return {
+                    'success': False, 
+                    'error': f'VLM-ONLY mode failed to find: {target}',
+                    'method': 'vlm_only_failed'
+                }
+
+            # --- CAPTCHA SPECIFIC LOGIC ---
+            captcha_keywords = ['captcha', 'robot', 'recaptcha', 'verification', 'human', 'challenge']
+            is_captcha = any(kw in target.lower() for kw in captcha_keywords)
+            
+            if is_captcha and self.fine_tuned_vlm and self.fine_tuned_vlm.is_available():
+                print(f"[Executor] CAPTCHA detected in target '{target}' - invoking fine-tuned VLM directly")
+                
+                # Take screenshot for VLM
+                screenshot = self.browser.take_screenshot()
+                if screenshot:
+                    # Specific prompts for CAPTCHA - try most specific first
+                    captcha_prompts = [
+                        "Click on the square box near I'm not a robot",
+                        "Click the checkbox for I'm not a robot",
+                        f"Click {target}"  # Fallback to original target
+                    ]
+                    
+                    for prompt in captcha_prompts:
+                        print(f"[Executor] Trying CAPTCHA prompt: '{prompt}'")
+                        element_id = self._try_fine_tuned_vlm(screenshot, prompt, elements)
+                        
+                        if element_id >= 0:
+                            print(f"[Executor] fine-tuned VLM found CAPTCHA element {element_id}")
+                            if self.browser.click_element(element_id, elements):
+                                self.stats['vision_success'] += 1
+                                time.sleep(Config.STEP_DELAY)
+                                return {
+                                    'success': True,
+                                    'method': 'vision_captcha',
+                                    'element_id': element_id,
+                                    'vision_reasoning': f"CAPTCHA (Fine-tuned VLM): {prompt}"
+                                }
+                    
+                    print("[Executor] Fine-tuned VLM failed for CAPTCHA, falling back to standard pipeline...")
+            
             # For visual tasks, try Vision FIRST
             if is_visual_task:
                 print("[Executor] Trying Vision first for visual task...")
@@ -985,6 +1076,12 @@ If no element matches, write: ANSWER: -1"""
                 except Exception as e:
                     print(f"[Vision Agent] Gemini error: {e}")
             
+            # Fallback to fine-tuned VLM
+            if self.fine_tuned_vlm and self.fine_tuned_vlm.is_available():
+                element_id = self._try_fine_tuned_vlm(screenshot, target, elements)
+                if element_id >= 0:
+                    return element_id
+            
             print("[Vision Agent] All vision agents failed to find element")
             return -1
             
@@ -993,6 +1090,111 @@ If no element matches, write: ANSWER: -1"""
             import traceback
             traceback.print_exc()
             return -1
+    
+    def _try_fine_tuned_vlm(
+        self, 
+        screenshot: bytes, 
+        target: str, 
+        elements: List[Dict]
+    ) -> int:
+        """
+        Try fine-tuned Qwen2-VL model for element finding.
+        
+        This is used as a last fallback when NVIDIA and Gemini fail.
+        The fine-tuned model directly predicts click coordinates.
+        
+        Args:
+            screenshot: Raw screenshot bytes (not annotated)
+            target: Target element description
+            elements: List of extracted DOM elements
+        
+        Returns:
+            Element ID or -1 if failed
+        """
+        try:
+            print("[Fine-tuned VLM] Trying fine-tuned Qwen2-VL...")
+            
+            # Get viewport size for coordinate conversion
+            try:
+                viewport = self.browser.page.viewport_size
+                width = viewport['width'] if viewport else 1920
+                height = viewport['height'] if viewport else 1080
+            except:
+                width, height = 1920, 1080
+            
+            # Format instruction for the model (same as training format)
+            instruction = f"Click {target}"
+            
+            # Get predicted screen coordinates
+            screen_x, screen_y = self.fine_tuned_vlm.predict_click(
+                screenshot, 
+                instruction,
+                image_size=(width, height)
+            )
+            
+            if screen_x < 0 or screen_y < 0:
+                print("[Fine-tuned VLM] Failed to get coordinates")
+                return -1
+            
+            print(f"[Fine-tuned VLM] Predicted coordinates: ({screen_x}, {screen_y})")
+            
+            # Find element at the predicted coordinates
+            element_id = self._find_element_at_point(screen_x, screen_y, elements)
+            
+            if element_id >= 0:
+                print(f"[Fine-tuned VLM] Found element {element_id} at ({screen_x}, {screen_y})")
+                self.last_vision_reasoning = f"Fine-tuned VLM predicted click at ({screen_x}, {screen_y})"
+                self.stats['vision_success'] += 1
+                return element_id
+            
+            # If no element found at exact coordinates, try nearby area
+            print("[Fine-tuned VLM] No element at exact point, checking nearby...")
+            for offset_x, offset_y in [(0, 0), (-20, 0), (20, 0), (0, -20), (0, 20), (-40, -40), (40, 40)]:
+                element_id = self._find_element_at_point(
+                    screen_x + offset_x, 
+                    screen_y + offset_y, 
+                    elements
+                )
+                if element_id >= 0:
+                    print(f"[Fine-tuned VLM] Found element {element_id} at offset ({offset_x}, {offset_y})")
+                    self.last_vision_reasoning = f"Fine-tuned VLM predicted click near ({screen_x}, {screen_y})"
+                    self.stats['vision_success'] += 1
+                    return element_id
+            
+            print("[Fine-tuned VLM] No element found at predicted location")
+            return -1
+            
+        except Exception as e:
+            print(f"[Fine-tuned VLM] Error: {e}")
+            import traceback
+            traceback.print_exc()
+            return -1
+    
+    def _find_element_at_point(self, x: int, y: int, elements: List[Dict]) -> int:
+        """
+        Find the element containing the given screen coordinates.
+        
+        Args:
+            x: Screen X coordinate
+            y: Screen Y coordinate
+            elements: List of extracted DOM elements
+        
+        Returns:
+            Element ID or -1 if not found
+        """
+        for elem in elements:
+            bbox = elem.get('bbox', {})
+            if bbox:
+                x1 = bbox.get('x', 0)
+                y1 = bbox.get('y', 0)
+                w = bbox.get('width', 0)
+                h = bbox.get('height', 0)
+                
+                # Check if point is inside bounding box
+                if x1 <= x <= x1 + w and y1 <= y <= y1 + h:
+                    return elem.get('id', -1)
+        
+        return -1
     
     def _execute_type(self, text: str) -> Dict:
         """Type text into focused element."""

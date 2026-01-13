@@ -1,98 +1,98 @@
 [
   {
     "id": 0,
-    "tag": "li",
-    "text": "Verify text saved",
-    "type": null,
+    "tag": "button",
+    "text": "Open Menu",
+    "type": "button",
     "bbox": {
-      "x": 436,
-      "y": -23,
-      "w": 552,
-      "h": 24
+      "x": 20,
+      "y": 20,
+      "w": 20,
+      "h": 20
     },
-    "html_id": "",
+    "html_id": "react-burger-menu-btn",
     "html_classes": ""
   },
   {
     "id": 1,
-    "tag": "li",
-    "text": "Open page",
-    "type": null,
+    "tag": "button",
+    "text": "Back to products",
+    "type": "submit",
     "bbox": {
-      "x": 436,
-      "y": 278,
-      "w": 552,
-      "h": 24
+      "x": 20,
+      "y": 69,
+      "w": 169,
+      "h": 32
     },
-    "html_id": "",
-    "html_classes": ""
+    "html_id": "back-to-products",
+    "html_classes": "btn btn_secondary back btn_large inventory_details_back_button"
   },
   {
     "id": 2,
-    "tag": "li",
-    "text": "Clear input field",
-    "type": null,
+    "tag": "button",
+    "text": "Add to cart",
+    "type": "submit",
     "bbox": {
-      "x": 436,
-      "y": 302,
-      "w": 552,
-      "h": 24
+      "x": 610,
+      "y": 379,
+      "w": 160,
+      "h": 34
     },
-    "html_id": "",
-    "html_classes": ""
+    "html_id": "add-to-cart",
+    "html_classes": "btn btn_primary btn_small btn_inventory"
   },
   {
     "id": 3,
-    "tag": "li",
-    "text": "Type text into the input field",
+    "tag": "a",
+    "text": "",
     "type": null,
     "bbox": {
-      "x": 436,
-      "y": 326,
-      "w": 552,
-      "h": 24
+      "x": 1365,
+      "y": 10,
+      "w": 40,
+      "h": 40
     },
     "html_id": "",
-    "html_classes": ""
+    "html_classes": "shopping_cart_link"
   },
   {
     "id": 4,
-    "tag": "li",
-    "text": "Verify text changed",
+    "tag": "a",
+    "text": "Twitter",
     "type": null,
     "bbox": {
-      "x": 436,
-      "y": 350,
-      "w": 552,
-      "h": 24
+      "x": 50,
+      "y": 847,
+      "w": 30,
+      "h": 30
     },
     "html_id": "",
     "html_classes": ""
   },
   {
     "id": 5,
-    "tag": "li",
-    "text": "Open page",
+    "tag": "a",
+    "text": "Facebook",
     "type": null,
     "bbox": {
-      "x": 436,
-      "y": 652,
-      "w": 552,
-      "h": 24
+      "x": 100,
+      "y": 847,
+      "w": 30,
+      "h": 30
     },
     "html_id": "",
     "html_classes": ""
   },
   {
     "id": 6,
-    "tag": "li",
-    "text": "Find the instructions text element",
+    "tag": "a",
+    "text": "LinkedIn",
     "type": null,
     "bbox": {
-      "x": 436,
-      "y": 676,
-      "w": 552,
-      "h": 24
+      "x": 150,
+      "y": 847,
+      "w": 30,
+      "h": 30
     },
     "html_id": "",
     "html_classes": ""
@@ -100,29 +100,43 @@
   {
     "id": 7,
     "tag": "li",
-    "text": "Push add button",
+    "text": "Twitter",
     "type": null,
     "bbox": {
-      "x": 436,
-      "y": 700,
-      "w": 552,
-      "h": 24
+      "x": 50,
+      "y": 847,
+      "w": 30,
+      "h": 30
     },
     "html_id": "",
-    "html_classes": ""
+    "html_classes": "social_twitter"
   },
   {
     "id": 8,
     "tag": "li",
-    "text": "Verify instruction text element is no longer displayed",
+    "text": "Facebook",
     "type": null,
     "bbox": {
-      "x": 436,
-      "y": 724,
-      "w": 552,
-      "h": 24
+      "x": 100,
+      "y": 847,
+      "w": 30,
+      "h": 30
     },
     "html_id": "",
-    "html_classes": ""
+    "html_classes": "social_facebook"
+  },
+  {
+    "id": 9,
+    "tag": "li",
+    "text": "LinkedIn",
+    "type": null,
+    "bbox": {
+      "x": 150,
+      "y": 847,
+      "w": 30,
+      "h": 30
+    },
+    "html_id": "",
+    "html_classes": "social_linkedin"
   }
 ]

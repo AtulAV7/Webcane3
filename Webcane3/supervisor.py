@@ -193,6 +193,7 @@ IMPORTANT - HANDLING GOAL BLOCKERS:
 
 CRITICAL RULES FOR GOAL COMPLETION:
 - ONLY do what the user asked for, nothing more!
+- MOST IMPORTANT - If the observer output description related to expected result of the goal - stop right there and output complete.
 - If goal is "search X" -> COMPLETE once search results are showing
 - If goal is "go to site and search X" -> COMPLETE once search results are showing
 - If goal is "click X" -> COMPLETE once X is clicked and page responds
